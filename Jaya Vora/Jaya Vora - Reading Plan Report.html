@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Plan Report - Jaya</title>
+<style>
+  :root {
+    --blue: #2F5496;
+    --blue-light: #D6E4F0;
+    --green: #548235;
+    --green-light: #E2EFDA;
+    --yellow: #BF8F00;
+    --yellow-light: #FFF2CC;
+    --orange: #C55A11;
+    --orange-light: #FCE4D6;
+    --red: #CC0000;
+    --dark: #1a1a2e;
+    --gray: #6c757d;
+    --border: #dee2e6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--blue), #1a3a6e);
+    color: white;
+    padding: 40px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  .header h1 { font-size: 28px; margin-bottom: 4px; }
+  .header .subtitle { font-size: 16px; opacity: 0.85; }
+  .header .meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 16px;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+  .header .meta span { background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; }
+
+  /* Score Cards */
+  .score-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .score-card {
+    background: white;
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    text-align: center;
+    border-top: 4px solid var(--blue);
+  }
+  .score-card.fail { border-top-color: var(--red); }
+  .score-card .score {
+    font-size: 42px;
+    font-weight: 700;
+    margin: 8px 0;
+  }
+  .score-card .score.low { color: var(--red); }
+  .score-card .score.mid { color: var(--orange); }
+  .score-card .score.high { color: var(--yellow); }
+  .score-card .test-name { font-size: 13px; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .score-card .date { font-size: 12px; color: #aaa; margin-top: 2px; }
+  .score-card .breakdown { font-size: 13px; margin-top: 10px; color: #555; }
+  .score-card .breakdown .wrong { color: var(--red); font-weight: 600; }
+  .score-card .breakdown .right { color: var(--green); }
+
+  /* Section */
+  .section {
+    background: white;
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .section h2 {
+    font-size: 20px;
+    color: var(--blue);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--blue-light);
+  }
+  .section h3 {
+    font-size: 16px;
+    color: #444;
+    margin: 18px 0 10px;
+  }
+
+  /* Skill Gap Bars */
+  .gap-list { list-style: none; }
+  .gap-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .gap-item:last-child { border-bottom: none; }
+  .gap-rank {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .gap-info { flex: 1; margin-left: 16px; }
+  .gap-name { font-weight: 600; font-size: 15px; }
+  .gap-desc { font-size: 13px; color: var(--gray); margin-top: 2px; }
+  .gap-bar-container {
+    width: 120px;
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+  .gap-bar {
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .gap-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--red);
+  }
+  .gap-count {
+    font-size: 12px;
+    color: var(--gray);
+    text-align: right;
+    margin-top: 2px;
+  }
+
+  /* Wrong Answers Table */
+  .detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  .detail-table thead th {
+    background: var(--blue);
+    color: white;
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .detail-table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+  }
+  .detail-table tbody tr:hover { background: #f8f9ff; }
+  .detail-table .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .tag-vocab { background: #fce4ec; color: #c62828; }
+  .tag-evidence { background: #e3f2fd; color: #1565c0; }
+  .tag-rhetoric { background: #fff3e0; color: #e65100; }
+  .tag-tone { background: #f3e5f5; color: #7b1fa2; }
+  .tag-inference { background: #e8f5e9; color: #2e7d32; }
+  .tag-comparison { background: #efebe9; color: #4e342e; }
+  .tag-structure { background: #e0f7fa; color: #00695c; }
+
+  /* Phase Plan */
+  .phase-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .phase-card {
+    border-radius: 10px;
+    padding: 20px;
+    border-left: 5px solid;
+  }
+  .phase-card.p1 { background: var(--blue-light); border-color: var(--blue); }
+  .phase-card.p2 { background: var(--green-light); border-color: var(--green); }
+  .phase-card.p3 { background: var(--yellow-light); border-color: var(--yellow); }
+  .phase-card.p4 { background: var(--orange-light); border-color: var(--orange); }
+  .phase-card .phase-title {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .phase-card .phase-weeks {
+    font-size: 12px;
+    color: var(--gray);
+    margin-bottom: 10px;
+  }
+  .phase-card .phase-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+  .phase-card .phase-stats .stat {
+    font-weight: 700;
+  }
+  .phase-card ul {
+    list-style: none;
+    font-size: 13px;
+  }
+  .phase-card ul li {
+    padding: 3px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .phase-card ul li::before {
+    content: '\2022';
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+
+  /* Detailed Lesson Table */
+  .lesson-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 12px;
+  }
+  .lesson-table thead th {
+    background: var(--blue);
+    color: white;
+    padding: 10px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+  }
+  .lesson-table tbody td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+  .lesson-table .phase-row td {
+    font-weight: 700;
+    font-size: 14px;
+    padding: 14px 10px 8px;
+    border-bottom: 2px solid #ccc;
+    background: #f8f8f8;
+  }
+  .lesson-table tbody tr:hover:not(.phase-row) { background: #f8f9ff; }
+  .lesson-table .xp { text-align: center; font-weight: 600; }
+  .lesson-table .grade { text-align: center; }
+
+  /* Totals bar */
+  .totals-bar {
+    display: flex;
+    justify-content: space-around;
+    background: linear-gradient(135deg, var(--blue), #1a3a6e);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 24px;
+    text-align: center;
+  }
+  .totals-bar .total-item .number {
+    font-size: 32px;
+    font-weight: 700;
+  }
+  .totals-bar .total-item .label {
+    font-size: 12px;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Filter buttons */
+  .filters {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 16px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+  }
+
+  .print-note {
+    text-align: center;
+    color: #aaa;
+    font-size: 12px;
+    margin-top: 32px;
+    padding-bottom: 20px;
+  }
+
+  @media print {
+    body { background: white; }
+    .container { max-width: 100%; padding: 0; }
+    .section { box-shadow: none; break-inside: avoid; }
+    .score-cards { break-inside: avoid; }
+    .phase-grid { break-inside: avoid; }
+    .print-note { display: none; }
+    .filters { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    .score-cards { grid-template-columns: 1fr; }
+    .phase-grid { grid-template-columns: 1fr; }
+    .header .meta { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Custom Reading Remediation Plan</h1>
+    <div class="subtitle">MobyMax Reading Skills - Personalized Intervention</div>
+    <div class="meta">
+      <span>Student: Jaya</span>
+      <span>Grade: 11</span>
+      <span>Report Date: March 26, 2026</span>
+      <span>Platform: MobyMax (Grades 6-8)</span>
+    </div>
+  </div>
+
+  <!-- Score Cards -->
+  <div class="score-cards">
+    <div class="score-card fail">
+      <div class="test-name">ELA STAAR G11.2014</div>
+      <div class="date">February 11, 2026</div>
+      <div class="score high">89.3%</div>
+      <div class="breakdown">
+        <span class="right">25 correct</span> &middot;
+        <span class="wrong">3 incorrect</span>
+      </div>
+    </div>
+    <div class="score-card fail">
+      <div class="test-name">Standardized Reading G11.2</div>
+      <div class="date">February 16, 2026</div>
+      <div class="score low">71.8%</div>
+      <div class="breakdown">
+        <span class="right">40 correct</span> &middot;
+        <span class="wrong">15 incorrect</span> &middot;
+        4 partial
+      </div>
+    </div>
+    <div class="score-card fail">
+      <div class="test-name">Standardized Reading G11.3</div>
+      <div class="date">March 3, 2026</div>
+      <div class="score mid">82.3%</div>
+      <div class="breakdown">
+        <span class="right">38 correct</span> &middot;
+        <span class="wrong">6 incorrect</span> &middot;
+        6 partial
+      </div>
+    </div>
+  </div>
+
+  <!-- Skill Gap Analysis -->
+  <div class="section">
+    <h2>Skill Gap Analysis</h2>
+    <p style="font-size:14px; color:#666; margin-bottom:16px;">Ranked by frequency of errors across all three tests. These foundational gaps are targeted by the MobyMax plan below.</p>
+    <ul class="gap-list">
+      <li class="gap-item">
+        <div class="gap-rank">1</div>
+        <div class="gap-info">
+          <div class="gap-name">Citing Textual Evidence / Selecting Best Evidence</div>
+          <div class="gap-desc">Consistently misses "Part B" questions asking which evidence best supports an answer. Most frequent error type across all 3 tests.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:100%"></div></div>
+          <div class="gap-count">8+ errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">2</div>
+        <div class="gap-info">
+          <div class="gap-name">Vocabulary / Context Clues</div>
+          <div class="gap-desc">Struggles with determining meaning of challenging words from context: peripheral, proprietary, vacillated, vague conjectures.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:62%"></div></div>
+          <div class="gap-count">5+ errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">3</div>
+        <div class="gap-info">
+          <div class="gap-name">Author's Purpose & Craft / Rhetoric</div>
+          <div class="gap-desc">Difficulty analyzing how authors use literary techniques (satire, irony, figurative language) to convey meaning or develop ideas.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:50%"></div></div>
+          <div class="gap-count">4+ errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">4</div>
+        <div class="gap-info">
+          <div class="gap-name">Tone & Tone Shifts</div>
+          <div class="gap-desc">Difficulty recognizing shifts in tone, particularly in poetry and rhetorical prose.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:25%"></div></div>
+          <div class="gap-count">2+ errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">5</div>
+        <div class="gap-info">
+          <div class="gap-name">Character Motivation / Inference</div>
+          <div class="gap-desc">Some difficulty inferring why characters act as they do from textual details.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:25%"></div></div>
+          <div class="gap-count">2+ errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">6</div>
+        <div class="gap-info">
+          <div class="gap-name">Cross-Text / Cross-Genre Comparison</div>
+          <div class="gap-desc">Difficulty comparing themes and portrayals across paired passages.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:12%"></div></div>
+          <div class="gap-count">1+ errors</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Wrong Answers Detail -->
+  <div class="section">
+    <h2>Wrong Answers - Detailed Breakdown</h2>
+
+    <h3>Test 1: Alpha ELA STAAR G11.2014 (3 wrong)</h3>
+    <table class="detail-table">
+      <thead>
+        <tr><th>Q#</th><th>Question</th><th>Skill Gap</th><th>Correct Answer</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Q2</td>
+          <td>Why does Alejandro allow the old woman to stay in the clinic?</td>
+          <td><span class="tag tag-inference">Inference</span></td>
+          <td>He assumes the nursing home director has political connections</td>
+        </tr>
+        <tr>
+          <td>Q15</td>
+          <td>How are the Tehuelche people and Inughuits portrayed across both texts?</td>
+          <td><span class="tag tag-comparison">Cross-Text</span></td>
+          <td>Isolated</td>
+        </tr>
+        <tr>
+          <td>Q22</td>
+          <td>In the last three lines, the tone of the poem shifts from &mdash;</td>
+          <td><span class="tag tag-tone">Tone Shifts</span></td>
+          <td>Hopeful to apprehensive</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Test 2: Alpha Standardized Reading G11.2 (15 wrong, 4 partial)</h3>
+    <table class="detail-table">
+      <thead>
+        <tr><th>Q#</th><th>Question</th><th>Skill Gap</th><th>Correct Answer</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Q3</td>
+          <td>Meaning of "peripheral" in line 21</td>
+          <td><span class="tag tag-vocab">Vocabulary</span></td>
+          <td>Unimportant</td>
+        </tr>
+        <tr>
+          <td>Q4</td>
+          <td>How does the author use satire to develop a central idea? (Part A)</td>
+          <td><span class="tag tag-rhetoric">Rhetoric</span></td>
+          <td>The anger of the Acharnians contrasts humorously with their desire for peace</td>
+        </tr>
+        <tr>
+          <td>Q5</td>
+          <td>Which two sections best support Part A? (Part B)</td>
+          <td><span class="tag tag-evidence">Evidence</span></td>
+          <td>Lines 10 and 11</td>
+        </tr>
+        <tr>
+          <td>Q7</td>
+          <td>Which detail from the drama best supports the correct Part A answer? (Part B)</td>
+          <td><span class="tag tag-evidence">Evidence</span></td>
+          <td>"Nothing can change the facts. You made a Truce with the SPARTANS!..." (line 20)</td>
+        </tr>
+        <tr>
+          <td>Q8</td>
+          <td>Based on the drama, the author believes that citizens have a duty to &mdash;</td>
+          <td><span class="tag tag-inference">Inference</span></td>
+          <td>Understand the facts of political situations</td>
+        </tr>
+        <tr>
+          <td>Q19</td>
+          <td>Meaning of "proprietary" in paragraph 12</td>
+          <td><span class="tag tag-vocab">Vocabulary</span></td>
+          <td>Private and unique</td>
+        </tr>
+        <tr>
+          <td>Q22</td>
+          <td>Which detail best supports the idea that living at the "back of beyond" helps her connect to nature?</td>
+          <td><span class="tag tag-evidence">Evidence</span></td>
+          <td>"Over the next few months, I began to count the passage of time in full moons..."</td>
+        </tr>
+        <tr>
+          <td>Q24</td>
+          <td>Which sentence best supports your answer in Part A? (Part B)</td>
+          <td><span class="tag tag-evidence">Evidence</span></td>
+          <td>"I feel most at home up here with my wild fellow canyon dwellers"</td>
+        </tr>
+        <tr>
+          <td>Q25</td>
+          <td>What does "vacillated" communicate to the reader? (Partial - 67%)</td>
+          <td><span class="tag tag-vocab">Vocabulary</span></td>
+          <td>Emotions in conflict; trouble deciding; kept changing mind</td>
+        </tr>
+        <tr>
+          <td>Q23</td>
+          <td>What does "vague conjectures" suggest about Carrie? (Part A)</td>
+          <td><span class="tag tag-vocab">Vocabulary</span></td>
+          <td>She has never been to a big city before</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Test 3: Alpha Standardized Reading G11.3 (6 wrong, 6 partial)</h3>
+    <table class="detail-table">
+      <thead>
+        <tr><th>Q#</th><th>Question</th><th>Skill Gap</th><th>Correct Answer</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Q1</td>
+          <td>How does the series of examples in paragraphs 1-3 help clarify points the author makes later?</td>
+          <td><span class="tag tag-structure">Structure</span></td>
+          <td>By highlighting the intriguing nature of the research done at the Carnegie Institution</td>
+        </tr>
+        <tr>
+          <td>Q13</td>
+          <td>How does "tyranny of the present" convey Emerson's point of view in paragraph 1?</td>
+          <td><span class="tag tag-rhetoric">Rhetoric</span></td>
+          <td>As an example of irony, it emphasizes the importance of enjoying present surroundings</td>
+        </tr>
+        <tr>
+          <td>Q16</td>
+          <td>Select two excerpts from Passage 1 that develop both themes (Part B, Partial 50%)</td>
+          <td><span class="tag tag-evidence">Evidence</span></td>
+          <td>Specific excerpts from Passage 1 developing both themes</td>
+        </tr>
+        <tr>
+          <td>Q23</td>
+          <td>"Vague conjectures" &mdash; what it suggests about Carrie (Part A)</td>
+          <td><span class="tag tag-vocab">Vocabulary</span></td>
+          <td>She has never been to a big city before</td>
+        </tr>
+        <tr>
+          <td>Q24</td>
+          <td>Which sentence best supports the answer to Part A? (Part B)</td>
+          <td><span class="tag tag-evidence">Evidence</span></td>
+          <td>"A half-equipped little knight she was, venturing to reconnoitre the mysterious city..." (paragraph 4)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Plan Summary -->
+  <div class="section">
+    <h2>MobyMax Remediation Plan Summary</h2>
+    <p style="font-size:14px; color:#666; margin-bottom:8px;">4-week plan using MobyMax Reading Skills (Grades 6-8) to address foundational gaps (~130 XP/week). Skills progress from basic to advanced within each area.</p>
+
+    <div class="phase-grid">
+      <div class="phase-card p1">
+        <div class="phase-title">Week 1: Vocabulary & Evidence Foundations</div>
+        <div class="phase-stats">
+          <span><span class="stat">26</span> lessons</span>
+          <span><span class="stat">130</span> XP</span>
+        </div>
+        <ul>
+          <li>Context Clues (Grades 6, 7, 8)</li>
+          <li>Analyzing & Citing Evidence (Grade 6)</li>
+          <li>Citing Textual Evidence (Grade 6)</li>
+        </ul>
+      </div>
+      <div class="phase-card p2">
+        <div class="phase-title">Week 2: Evidence Mastery</div>
+        <div class="phase-stats">
+          <span><span class="stat">19</span> lessons</span>
+          <span><span class="stat">131</span> XP</span>
+        </div>
+        <ul>
+          <li>Analyzing Texts (Grades 7 & 8)</li>
+          <li>Citing Textual Evidence (Grades 7 & 8)</li>
+        </ul>
+      </div>
+      <div class="phase-card p3">
+        <div class="phase-title">Week 3: Rhetoric & Figurative Language</div>
+        <div class="phase-stats">
+          <span><span class="stat">31</span> lessons</span>
+          <span><span class="stat">131</span> XP</span>
+        </div>
+        <ul>
+          <li>Citing Textual Evidence (Grade 8)</li>
+          <li>Figurative Language (Grades 7 & 8)</li>
+          <li>Rhetoric & Logic (Grades 7 & 8)</li>
+          <li>Connotation & Tone (Grades 7 & 8)</li>
+        </ul>
+      </div>
+      <div class="phase-card p4">
+        <div class="phase-title">Week 4: Genre, Structure & Synthesis</div>
+        <div class="phase-stats">
+          <span><span class="stat">31</span> lessons</span>
+          <span><span class="stat">130</span> XP</span>
+        </div>
+        <ul>
+          <li>Drama Structure (Grades 7 & 8)</li>
+          <li>Poetry Structure (Grade 7)</li>
+          <li>Cross-Text Comparison (Grades 7 & 8)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Totals -->
+  <div class="totals-bar">
+    <div class="total-item">
+      <div class="number">107</div>
+      <div class="label">Total Lessons</div>
+    </div>
+    <div class="total-item">
+      <div class="number">522</div>
+      <div class="label">Total XP</div>
+    </div>
+    <div class="total-item">
+      <div class="number">4</div>
+      <div class="label">Weeks</div>
+    </div>
+    <div class="total-item">
+      <div class="number">6</div>
+      <div class="label">Skill Areas</div>
+    </div>
+  </div>
+
+  <!-- Detailed Lesson List -->
+  <div class="section" style="margin-top:24px;">
+    <h2>Complete Lesson List by Week</h2>
+    <p style="font-size:14px; color:#666; margin-bottom:4px;">All 107 MobyMax lessons organized by week, mapped to the specific skill gap each addresses.</p>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterPhase('all',this)">All Weeks</button>
+      <button class="filter-btn" onclick="filterPhase('w1',this)">Week 1</button>
+      <button class="filter-btn" onclick="filterPhase('w2',this)">Week 2</button>
+      <button class="filter-btn" onclick="filterPhase('w3',this)">Week 3</button>
+      <button class="filter-btn" onclick="filterPhase('w4',this)">Week 4</button>
+    </div>
+
+    <table class="lesson-table" id="lessonTable">
+      <thead>
+        <tr>
+          <th style="width:50px">Gr</th>
+          <th>Course</th>
+          <th>Topic</th>
+          <th>Lesson</th>
+          <th style="width:50px">XP</th>
+          <th>Skill Gap</th>
+        </tr>
+      </thead>
+      <tbody id="lessonBody">
+      </tbody>
+    </table>
+  </div>
+
+  <p class="print-note">Generated March 26, 2026 &middot; Custom plan based on analysis of 3 failed Grade 11 reading assessments</p>
+
+</div>
+
+<script>
+const lessons = [
+  {phase:"w1",phaseName:"Week 1: Vocabulary & Evidence Foundations",gr:6,course:"Informational",topic:"Context Clues",lesson:"Use definitions to determine word meaning",xp:3,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:6,course:"Informational",topic:"Context Clues",lesson:"Use examples to determine word meaning",xp:3,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:6,course:"Informational",topic:"Context Clues",lesson:"Use cause and effect to determine word meaning",xp:3,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:6,course:"Informational",topic:"Context Clues",lesson:"Use comparison and contrast to determine word meaning",xp:3,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:7,course:"Informational",topic:"Context Clues",lesson:"Use examples to determine the meaning of a word",xp:4,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:7,course:"Informational",topic:"Context Clues",lesson:"Use cause and effect to determine the meaning of a word",xp:3,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:7,course:"Informational",topic:"Context Clues",lesson:"Use comparison and contrast to determine the meaning of a word",xp:3,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:7,course:"Informational",topic:"Context Clues",lesson:"Use details in a text to determine the meaning of a word",xp:5,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:8,course:"Informational",topic:"Context Clues",lesson:"Use examples to determine word meaning",xp:3,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:8,course:"Informational",topic:"Context Clues",lesson:"Use cause and effect to determine word meaning",xp:3,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:8,course:"Informational",topic:"Context Clues",lesson:"Use comparison and contrast to determine word meaning",xp:4,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:8,course:"Informational",topic:"Context Clues",lesson:"Use paragraph-level context clues to determine the meaning of a word",xp:4,gap:"Vocabulary / Context Clues"},
+  {phase:"w1",gr:6,course:"Informational",topic:"Analyzing and Citing Evidence",lesson:"Identify explicit and implicit information",xp:4,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:6,course:"Informational",topic:"Analyzing and Citing Evidence",lesson:"Cite textual evidence to support a claim",xp:7,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:6,course:"Informational",topic:"Analyzing and Citing Evidence",lesson:"Make an inference",xp:8,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:6,course:"Informational",topic:"Analyzing and Citing Evidence",lesson:"Cite textual evidence to support an inference",xp:6,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:6,course:"Informational",topic:"Analyzing and Citing Evidence",lesson:"Identify weak evidence",xp:7,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:6,course:"Informational",topic:"Analyzing and Citing Evidence",lesson:"Use evidence to analyze a text",xp:7,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:6,course:"Literature",topic:"Citing Textual Evidence",lesson:"Cite evidence from a text to support a claim",xp:5,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:6,course:"Literature",topic:"Citing Textual Evidence",lesson:"Make inferences about a text",xp:5,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:6,course:"Literature",topic:"Citing Textual Evidence",lesson:"Cite evidence from a text to support an inference",xp:5,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:7,course:"Informational",topic:"Analyzing Texts",lesson:"Identify explicit and implicit information",xp:8,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:7,course:"Informational",topic:"Analyzing Texts",lesson:"Cite textual evidence to support a claim",xp:7,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:7,course:"Informational",topic:"Analyzing Texts",lesson:"Make an inference",xp:7,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:7,course:"Informational",topic:"Analyzing Texts",lesson:"Cite textual evidence to support an inference",xp:6,gap:"Citing Textual Evidence"},
+  {phase:"w1",gr:7,course:"Informational",topic:"Analyzing Texts",lesson:"Identify weak evidence",xp:7,gap:"Citing Textual Evidence"},
+  {phase:"w2",phaseName:"Week 2: Evidence Mastery",gr:7,course:"Informational",topic:"Analyzing Texts",lesson:"Evaluate sources",xp:7,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:7,course:"Informational",topic:"Analyzing Texts",lesson:"Choose the strongest evidence to support an idea",xp:8,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:7,course:"Informational",topic:"Analyzing Texts",lesson:"Use evidence to analyze a text",xp:9,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:7,course:"Literature",topic:"Citing Textual Evidence",lesson:"Cite textual evidence to support a claim",xp:6,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:7,course:"Literature",topic:"Citing Textual Evidence",lesson:"Make inferences",xp:8,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:7,course:"Literature",topic:"Citing Textual Evidence",lesson:"Distinguish between explicit and implicit information",xp:4,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:7,course:"Literature",topic:"Citing Textual Evidence",lesson:"Provide multiple pieces of evidence to support analysis",xp:6,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Informational",topic:"Analyzing Text",lesson:"Identify explicit and implicit Information",xp:9,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Informational",topic:"Analyzing Text",lesson:"Cite textual evidence to support a claim",xp:6,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Informational",topic:"Analyzing Text",lesson:"Make an inference",xp:8,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Informational",topic:"Analyzing Text",lesson:"Cite textual evidence to support an inference",xp:8,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Informational",topic:"Analyzing Text",lesson:"Identify weak evidence",xp:7,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Informational",topic:"Analyzing Text",lesson:"Evaluate sources",xp:6,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Informational",topic:"Analyzing Text",lesson:"Choose the strongest evidence",xp:6,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Informational",topic:"Analyzing Text",lesson:"Evaluate credibility of sources",xp:7,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Informational",topic:"Analyzing Text",lesson:"Use evidence to analyze a text",xp:9,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Literature",topic:"Citing Textual Evidence",lesson:"Cite textual evidence to support a claim",xp:6,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Literature",topic:"Citing Textual Evidence",lesson:"Make inferences",xp:5,gap:"Citing Textual Evidence"},
+  {phase:"w2",gr:8,course:"Literature",topic:"Citing Textual Evidence",lesson:"Support inferences with evidence",xp:6,gap:"Citing Textual Evidence"},
+  {phase:"w3",phaseName:"Week 3: Rhetoric & Figurative Language",gr:8,course:"Literature",topic:"Citing Textual Evidence",lesson:"Distinguish between explicit and implicit information",xp:5,gap:"Citing Textual Evidence"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Citing Textual Evidence",lesson:"Provide multiple pieces of evidence to support analysis",xp:6,gap:"Citing Textual Evidence"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Citing Textual Evidence",lesson:"Determine the strongest support for a claim",xp:6,gap:"Citing Textual Evidence"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Citing Textual Evidence",lesson:"Use evidence to analyze a text",xp:8,gap:"Citing Textual Evidence"},
+  {phase:"w3",gr:7,course:"Literature",topic:"Figurative Language",lesson:"Identify figurative language",xp:3,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:7,course:"Literature",topic:"Figurative Language",lesson:"Interpret similes",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:7,course:"Literature",topic:"Figurative Language",lesson:"Interpret metaphors",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:7,course:"Literature",topic:"Figurative Language",lesson:"Interpret personification",xp:3,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:7,course:"Literature",topic:"Figurative Language",lesson:"Interpret hyperbole",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:7,course:"Literature",topic:"Figurative Language",lesson:"Interpret allusion",xp:3,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:7,course:"Literature",topic:"Figurative Language",lesson:"Interpret idioms",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Figurative Language",lesson:"Determine the meaning of a simile",xp:3,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Figurative Language",lesson:"Determine the meaning of a metaphor",xp:3,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Figurative Language",lesson:"Determine the meaning of an idiom",xp:3,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Figurative Language",lesson:"Determine the meaning of a hyperbole",xp:5,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Figurative Language",lesson:"Determine the meaning of personification",xp:3,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Figurative Language",lesson:"Determine the meaning of an analogy",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Figurative Language",lesson:"Determine the meaning of an allusion",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Figurative Language",lesson:"Identify figurative language",xp:5,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Figurative Language",lesson:"Interpret figurative language in poetry",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Literature",topic:"Figurative Language",lesson:"Interpret verbal irony in a text",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:7,course:"Informational",topic:"Rhetoric and Logic",lesson:"Explain the use of rhetorical questions",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:7,course:"Informational",topic:"Rhetoric and Logic",lesson:"Explain the use of irony",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:7,course:"Informational",topic:"Rhetoric and Logic",lesson:"Logical fallacies, part 1",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:7,course:"Informational",topic:"Rhetoric and Logic",lesson:"Logical fallacies, part 2",xp:7,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Informational",topic:"Rhetoric and Logic",lesson:"Explain the use of rhetorical questions",xp:3,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Informational",topic:"Rhetoric and Logic",lesson:"Explain the use of irony",xp:4,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Informational",topic:"Rhetoric and Logic",lesson:"Logical fallacies, part 1",xp:6,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:8,course:"Informational",topic:"Rhetoric and Logic",lesson:"Logical fallacies, part",xp:5,gap:"Author's Purpose & Rhetoric"},
+  {phase:"w3",gr:7,course:"Literature",topic:"Connotation",lesson:"Determine the connotation of a word",xp:2,gap:"Tone & Connotation"},
+  {phase:"w3",gr:7,course:"Literature",topic:"Connotation",lesson:"Interpret shades of meaning using connotation",xp:4,gap:"Tone & Connotation"},
+  {phase:"w4",phaseName:"Week 4: Genre, Structure & Synthesis",gr:7,course:"Literature",topic:"Connotation",lesson:"Explain how an author's word choice creates mood",xp:4,gap:"Tone & Connotation"},
+  {phase:"w4",gr:8,course:"Literature",topic:"How Word Choice Affects Meaning and Tone",lesson:"Determine the tone of a text",xp:4,gap:"Tone & Connotation"},
+  {phase:"w4",gr:8,course:"Literature",topic:"How Word Choice Affects Meaning and Tone",lesson:"Determine how an author uses specific words or phrases to set a tone",xp:4,gap:"Tone & Connotation"},
+  {phase:"w4",gr:8,course:"Literature",topic:"How Word Choice Affects Meaning and Tone",lesson:"Analyze how allusions can enhance the meaning of a text",xp:3,gap:"Tone & Connotation"},
+  {phase:"w4",gr:8,course:"Literature",topic:"How Word Choice Affects Meaning and Tone",lesson:"Analyze how connotations can create a specific tone",xp:2,gap:"Tone & Connotation"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Drama",lesson:"Identify the parts of a script",xp:3,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Drama",lesson:"Differentiate between scenes and acts in drama",xp:3,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Drama",lesson:"Understand the importance of dialogue in drama",xp:5,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Drama",lesson:"Understand the importance of monologues, soliloquies, and asides in a drama",xp:5,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Drama",lesson:"Understand stage directions in a drama",xp:4,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Drama",lesson:"Differentiate between dialogue and stage directions in a drama",xp:2,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Drama",lesson:"Identify settings and setting descriptions",xp:4,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Drama",lesson:"Analyze theme development in drama",xp:4,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Drama",lesson:"Compare comedies and tragedies",xp:4,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:8,course:"Literature",topic:"Structure of Drama",lesson:"Understand the importance of soliloquies, monologues, and asides in a drama",xp:5,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:8,course:"Literature",topic:"Structure of Drama",lesson:"Compare and contrast one-act and three-act plays",xp:3,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Poetry",lesson:"Identify stanzas and lines within a poem",xp:3,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Poetry",lesson:"Differentiate between internal and end rhyme",xp:4,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Poetry",lesson:"Identify a poem’s rhyme scheme",xp:4,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Poetry",lesson:"Identify and describe meter within a poem",xp:5,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Poetry",lesson:"Identify stressed and unstressed syllables in a poem",xp:4,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Poetry",lesson:"Differentiate between lyric poetry and narrative poetry",xp:4,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Poetry",lesson:"Recognize sonnets and villanelles",xp:4,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Poetry",lesson:"Recognize odes, ballads, and free-verse poems",xp:4,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Structure of Poetry",lesson:"Understand the meaning of poetic forms",xp:5,gap:"Drama & Poetry Structure"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Comparing and Contrasting Between Forms and Genres",lesson:"Classify fiction according to genre",xp:5,gap:"Cross-Text Comparison"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Comparing and Contrasting Between Forms and Genres",lesson:"Compare and contrast how similar themes and topics are addressed in different forms",xp:7,gap:"Cross-Text Comparison"},
+  {phase:"w4",gr:7,course:"Literature",topic:"Comparing and Contrasting Between Forms and Genres",lesson:"Compare and contrast how similar themes and topics are addressed in different genres",xp:7,gap:"Cross-Text Comparison"},
+  {phase:"w4",gr:8,course:"Literature",topic:"Comparing and Contrasting Between Forms and Genres",lesson:"Classify fiction according to genre",xp:5,gap:"Cross-Text Comparison"},
+  {phase:"w4",gr:8,course:"Literature",topic:"Comparing and Contrasting Between Forms and Genres",lesson:"Compare and contrast how similar themes and topics are addressed in different forms",xp:6,gap:"Cross-Text Comparison"},
+  {phase:"w4",gr:8,course:"Literature",topic:"Comparing and Contrasting Between Forms and Genres",lesson:"Compare and contrast how similar themes and topics are addressed in different genres",xp:4,gap:"Cross-Text Comparison"}
+];
+
+function renderLessons(filter) {
+  const tbody = document.getElementById('lessonBody');
+  tbody.innerHTML = '';
+  let currentPhase = '';
+  const colors = {w1:'#D6E4F0',w2:'#E2EFDA',w3:'#FFF2CC',w4:'#FCE4D6'};
+  const phaseNames = {
+    w1:'Week 1: Vocabulary & Evidence Foundations — 130 XP',
+    w2:'Week 2: Evidence Mastery — 131 XP',
+    w3:'Week 3: Rhetoric & Figurative Language — 131 XP',
+    w4:'Week 4: Genre, Structure & Synthesis — 130 XP'
+  };
+
+  const filtered = filter === 'all' ? lessons : lessons.filter(l => l.phase === filter);
+
+  filtered.forEach(l => {
+    if (l.phase !== currentPhase) {
+      currentPhase = l.phase;
+      const phaseRow = document.createElement('tr');
+      phaseRow.className = 'phase-row';
+      phaseRow.dataset.phase = l.phase;
+      phaseRow.innerHTML = `<td colspan="6" style="background:${colors[l.phase]}">${phaseNames[l.phase]}</td>`;
+      tbody.appendChild(phaseRow);
+    }
+    const tr = document.createElement('tr');
+    tr.dataset.phase = l.phase;
+    tr.innerHTML = `
+      <td class="grade">${l.gr}</td>
+      <td>${l.course}</td>
+      <td>${l.topic}</td>
+      <td>${l.lesson}</td>
+      <td class="xp">${l.xp}</td>
+      <td><span class="tag tag-${l.gap.includes('Vocab')?'vocab':l.gap.includes('Citing')?'evidence':l.gap.includes('Author')||l.gap.includes('Rhetoric')?'rhetoric':l.gap.includes('Tone')?'tone':l.gap.includes('Cross')?'comparison':'structure'}">${l.gap}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterPhase(phase, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLessons(phase);
+}
+
+renderLessons('all');
+</script>
+
+</body>
+</html>

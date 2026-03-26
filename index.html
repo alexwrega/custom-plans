@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custom MobyMax Reading Plans</title>
+<style>
+  :root {
+    --blue: #2F5496;
+    --blue-light: #D6E4F0;
+    --green: #548235;
+    --gray: #6c757d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .header {
+    background: linear-gradient(135deg, var(--blue), #1a3a6e);
+    color: white;
+    padding: 40px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  .header h1 { font-size: 28px; margin-bottom: 6px; }
+  .header .subtitle { font-size: 15px; opacity: 0.85; }
+
+  .plan-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .plan-card {
+    background: white;
+    border-radius: 10px;
+    padding: 24px 28px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-left: 5px solid var(--blue);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s, transform 0.15s;
+  }
+  .plan-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+  }
+
+  .plan-info h2 {
+    font-size: 18px;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+  .plan-info .meta {
+    font-size: 13px;
+    color: var(--gray);
+  }
+  .plan-info .meta span {
+    margin-right: 16px;
+  }
+
+  .plan-stats {
+    display: flex;
+    gap: 20px;
+    text-align: center;
+  }
+  .plan-stats .stat-item .number {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue);
+  }
+  .plan-stats .stat-item .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--gray);
+    letter-spacing: 0.5px;
+  }
+
+  .arrow {
+    font-size: 24px;
+    color: #ccc;
+    margin-left: 16px;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 13px;
+    color: #aaa;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Custom MobyMax Reading Plans</h1>
+    <div class="subtitle">Individualized remediation plans based on reading assessment analysis</div>
+  </div>
+
+  <div class="plan-list">
+
+    <a class="plan-card" href="Jaya Vora/Jaya Vora - Reading Plan Report.html">
+      <div class="plan-info">
+        <h2>Jaya</h2>
+        <div class="meta">
+          <span>Grade 11</span>
+          <span>Reading Skills (Grades 6-8)</span>
+          <span>Created Mar 26, 2026</span>
+        </div>
+      </div>
+      <div class="plan-stats">
+        <div class="stat-item">
+          <div class="number">107</div>
+          <div class="label">Lessons</div>
+        </div>
+        <div class="stat-item">
+          <div class="number">522</div>
+          <div class="label">XP</div>
+        </div>
+        <div class="stat-item">
+          <div class="number">4</div>
+          <div class="label">Weeks</div>
+        </div>
+      </div>
+      <div class="arrow">&rsaquo;</div>
+    </a>
+
+    <!-- Add more plan cards here -->
+
+  </div>
+
+  <div class="footer">
+    Custom plans generated from MobyMax Reading Skills curriculum
+  </div>
+
+</div>
+</body>
+</html>
