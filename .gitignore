@@ -1,0 +1,12 @@
+# Credentials — never commit
+timeback-creds.txt
+*creds*
+*credentials*
+*.env
+*secret*
+
+# macOS
+.DS_Store
+
+# Claude Code local settings
+.claude/

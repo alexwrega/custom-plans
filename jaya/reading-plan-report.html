@@ -716,6 +716,17 @@
     </table>
   </div>
 
+  <!-- API Sheet Export -->
+  <div class="section" style="margin-top:24px;">
+    <h2>API Sheet Export</h2>
+    <p style="font-size:14px; color:#666; margin-bottom:12px;">Tab-separated rows matching the <em>API</em> tab format. The <code>lesson_id</code> column is left blank and will be populated later.</p>
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+      <button id="apiCopyBtn" onclick="copyApiTSV()" style="background:var(--blue); color:white; border:none; padding:8px 16px; border-radius:6px; font-size:14px; cursor:pointer;">Copy to clipboard</button>
+      <span id="apiCopyMsg" style="font-size:13px; color:var(--green); font-weight:600;"></span>
+    </div>
+    <pre id="apiBlock" style="background:#1e1e2e; color:#e8e8f0; padding:16px; border-radius:8px; font-family:'SF Mono', Menlo, Consolas, monospace; font-size:12px; line-height:1.5; overflow:auto; max-height:400px; white-space:pre;"></pre>
+  </div>
+
   <p class="print-note">Generated March 26, 2026 &middot; Custom plan based on analysis of 3 failed Grade 11 reading assessments</p>
 
 </div>
@@ -875,6 +886,141 @@ function filterPhase(phase, btn) {
 }
 
 renderLessons('all');
+
+const lessonIds = [
+  "mobymax_informational_text_72_g6",
+  "mobymax_informational_text_106_g6",
+  "mobymax_informational_text_128_g6",
+  "mobymax_informational_text_108_g6",
+  "mobymax_informational_text_268_g7",
+  "mobymax_informational_text_269_g7",
+  "mobymax_informational_text_293_g7",
+  "mobymax_informational_text_302_g7",
+  "mobymax_informational_text_348_g8",
+  "mobymax_informational_text_349_g8",
+  "mobymax_informational_text_350_g8",
+  "mobymax_informational_text_351_g8",
+  "mobymax_informational_text_41_g6",
+  "mobymax_informational_text_42_g6",
+  "mobymax_informational_text_50_g6",
+  "mobymax_informational_text_63_g6",
+  "mobymax_informational_text_65_g6",
+  "mobymax_informational_text_70_g6",
+  "mobymax_reading_336_g6",
+  "mobymax_reading_337_g6",
+  "mobymax_reading_338_g6",
+  "mobymax_informational_text_98_g7",
+  "mobymax_informational_text_99_g7",
+  "mobymax_informational_text_100_g7",
+  "mobymax_informational_text_101_g7",
+  "mobymax_informational_text_102_g7",
+  "mobymax_informational_text_103_g7",
+  "mobymax_informational_text_104_g7",
+  "mobymax_informational_text_105_g7",
+  "mobymax_reading_510_g7",
+  "mobymax_reading_511_g7",
+  "mobymax_reading_513_g7",
+  "mobymax_reading_514_g7",
+  "mobymax_informational_text_156_g8",
+  "mobymax_informational_text_157_g8",
+  "mobymax_informational_text_165_g8",
+  "mobymax_informational_text_166_g8",
+  "mobymax_informational_text_167_g8",
+  "mobymax_informational_text_168_g8",
+  "mobymax_informational_text_164_g8",
+  "mobymax_informational_text_169_g8",
+  "mobymax_informational_text_170_g8",
+  "mobymax_reading_541_g8",
+  "mobymax_reading_542_g8",
+  "mobymax_reading_543_g8",
+  "mobymax_reading_544_g8",
+  "mobymax_reading_545_g8",
+  "mobymax_reading_546_g8",
+  "mobymax_reading_547_g8",
+  "mobymax_reading_506_g7",
+  "mobymax_reading_507_g7",
+  "mobymax_reading_517_g7",
+  "mobymax_reading_1753_g7",
+  "mobymax_reading_1756_g7",
+  "mobymax_reading_1750_g7",
+  "mobymax_reading_1759_g7",
+  "mobymax_reading_527_g8",
+  "mobymax_reading_528_g8",
+  "mobymax_reading_529_g8",
+  "mobymax_reading_537_g8",
+  "mobymax_reading_538_g8",
+  "mobymax_reading_539_g8",
+  "mobymax_reading_540_g8",
+  "mobymax_reading_550_g8",
+  "mobymax_reading_1783_g8",
+  "mobymax_reading_1868_g8",
+  "mobymax_informational_text_1464_g7",
+  "mobymax_informational_text_1461_g7",
+  "mobymax_informational_text_1452_g7",
+  "mobymax_informational_text_1455_g7",
+  "mobymax_informational_text_1536_g8",
+  "mobymax_informational_text_1533_g8",
+  "mobymax_informational_text_1527_g8",
+  "mobymax_informational_text_1530_g8",
+  "mobymax_reading_518_g7",
+  "mobymax_reading_509_g7",
+  "mobymax_reading_2049_g7",
+  "mobymax_reading_558_g8",
+  "mobymax_reading_562_g8",
+  "mobymax_reading_563_g8",
+  "mobymax_reading_564_g8",
+  "mobymax_reading_286_g7",
+  "mobymax_reading_287_g7",
+  "mobymax_reading_288_g7",
+  "mobymax_reading_270_g7",
+  "mobymax_reading_284_g7",
+  "mobymax_reading_289_g7",
+  "mobymax_reading_290_g7",
+  "mobymax_reading_292_g7",
+  "mobymax_reading_271_g7",
+  "mobymax_reading_533_g8",
+  "mobymax_reading_534_g8",
+  "mobymax_reading_293_g7",
+  "mobymax_reading_294_g7",
+  "mobymax_reading_295_g7",
+  "mobymax_reading_296_g7",
+  "mobymax_reading_272_g7",
+  "mobymax_reading_298_g7",
+  "mobymax_reading_274_g7",
+  "mobymax_reading_276_g7",
+  "mobymax_reading_1747_g7",
+  "mobymax_reading_1503_g7",
+  "mobymax_reading_1505_g7",
+  "mobymax_reading_1507_g7",
+  "mobymax_reading_1509_g8",
+  "mobymax_reading_1511_g8",
+  "mobymax_reading_1513_g8"
+];
+
+function buildApiTSV() {
+  const header = ['email','lesson_id','order','lesson name','subject','course title','course source'].join('\t');
+  const email = 'jaya.vora@alpha.school';
+  const subject = 'Reading';
+  const grades = [...new Set(lessons.map(l => l.gr))].sort((a,b) => a - b);
+  const gradeLabel = grades.length > 1 ? `G${grades[0]}-${grades[grades.length-1]}` : `G${grades[0]}`;
+  const courseTitle = `MobyMax Reading Skills ${gradeLabel} HFing Course Jaya Vora 03-26-2026`;
+  const rows = lessons.map((l, i) => {
+    const courseSource = `MobyMax - Reading Skills ${l.course === 'Literature' ? 'Literature' : 'Informational'} ${l.gr} Hole-Filling`;
+    return [email, lessonIds[i] || '', i + 1, l.lesson, subject, courseTitle, courseSource].join('\t');
+  });
+  return [header, ...rows].join('\n');
+}
+
+document.getElementById('apiBlock').textContent = buildApiTSV();
+
+function copyApiTSV() {
+  const text = buildApiTSV();
+  navigator.clipboard.writeText(text).then(() => {
+    const msg = document.getElementById('apiCopyMsg');
+    msg.textContent = 'Copied!';
+    setTimeout(() => { msg.textContent = ''; }, 2000);
+  });
+}
 </script>
 
 </body>
