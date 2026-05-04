@@ -5,6 +5,12 @@ timeback-creds.txt
 *.env
 *secret*
 
+# Student source folders
+Ada Cone/
+Jacob Mooso/
+Lily Gray/
+Elena Mentgen/
+
 # macOS
 .DS_Store
 

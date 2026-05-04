@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Plan Report - Ada Cone</title>
+<style>
+  :root {
+    --blue: #2F5496;
+    --blue-light: #D6E4F0;
+    --green: #548235;
+    --green-light: #E2EFDA;
+    --yellow: #BF8F00;
+    --yellow-light: #FFF2CC;
+    --orange: #C55A11;
+    --orange-light: #FCE4D6;
+    --purple: #7B1FA2;
+    --purple-light: #F3E5F5;
+    --teal: #00695C;
+    --teal-light: #E0F7FA;
+    --red: #CC0000;
+    --dark: #1a1a2e;
+    --gray: #6c757d;
+    --border: #dee2e6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .header {
+    background: linear-gradient(135deg, var(--blue), #1a3a6e);
+    color: white;
+    padding: 40px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  .header h1 { font-size: 28px; margin-bottom: 4px; }
+  .header .subtitle { font-size: 16px; opacity: 0.85; }
+  .header .meta {
+    display: flex; gap: 24px; margin-top: 16px;
+    font-size: 14px; opacity: 0.9; flex-wrap: wrap;
+  }
+  .header .meta span { background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; }
+  .score-cards {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px; margin-bottom: 24px;
+  }
+  .score-card {
+    background: white; border-radius: 10px; padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center;
+    border-top: 4px solid var(--blue);
+  }
+  .score-card.fail { border-top-color: var(--red); }
+  .score-card.warn { border-top-color: var(--yellow); }
+  .score-card.pass { border-top-color: var(--green); }
+  .score-card .score { font-size: 32px; font-weight: 700; margin: 6px 0; }
+  .score-card .score.low { color: var(--red); }
+  .score-card .score.mid { color: var(--yellow); }
+  .score-card .score.high { color: var(--green); }
+  .score-card .test-name { font-size: 12px; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .score-card .date { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .score-card .breakdown { font-size: 12px; margin-top: 6px; color: #555; }
+  .score-card .breakdown .wrong { color: var(--red); font-weight: 600; }
+  .score-card .breakdown .right { color: var(--green); }
+  .section {
+    background: white; border-radius: 10px; padding: 28px 32px;
+    margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .section h2 {
+    font-size: 20px; color: var(--blue); margin-bottom: 16px;
+    padding-bottom: 10px; border-bottom: 2px solid var(--blue-light);
+  }
+  .section h3 { font-size: 16px; color: #444; margin: 18px 0 10px; }
+  .gap-list { list-style: none; }
+  .gap-item {
+    display: flex; align-items: center; padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .gap-item:last-child { border-bottom: none; }
+  .gap-rank {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--blue);
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; flex-shrink: 0;
+  }
+  .gap-info { flex: 1; margin-left: 16px; }
+  .gap-name { font-weight: 600; font-size: 15px; }
+  .gap-desc { font-size: 13px; color: var(--gray); margin-top: 2px; }
+  .gap-bar-container { width: 120px; flex-shrink: 0; margin-left: 16px; }
+  .gap-bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
+  .gap-bar-fill { height: 100%; border-radius: 4px; background: var(--red); }
+  .gap-count { font-size: 12px; color: var(--gray); text-align: right; margin-top: 2px; }
+  .detail-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+  .detail-table thead th {
+    background: var(--blue); color: white; padding: 10px 12px; text-align: left;
+    font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .detail-table tbody td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+  .detail-table tbody tr:hover { background: #f8f9ff; }
+  .detail-table .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+  }
+  .tag-vocab { background: #fce4ec; color: #c62828; }
+  .tag-purpose { background: #fff3e0; color: #e65100; }
+  .tag-inference { background: #e8f5e9; color: #2e7d32; }
+  .tag-evidence { background: #e3f2fd; color: #1565c0; }
+  .tag-poetry { background: #f3e5f5; color: #7b1fa2; }
+  .tag-features { background: #e0f7fa; color: #00695c; }
+  .tag-plot { background: #efebe9; color: #4e342e; }
+  .tag-summary { background: #fff8e1; color: #ff6f00; }
+  .tag-comparison { background: #ede7f6; color: #4527a0; }
+  .phase-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 16px; margin-top: 16px;
+  }
+  .phase-card { border-radius: 10px; padding: 20px; border-left: 5px solid; }
+  .phase-card.p1 { background: var(--blue-light); border-color: var(--blue); }
+  .phase-card.p2 { background: var(--green-light); border-color: var(--green); }
+  .phase-card.p3 { background: var(--yellow-light); border-color: var(--yellow); }
+  .phase-card.p4 { background: var(--orange-light); border-color: var(--orange); }
+  .phase-card .phase-title { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+  .phase-card .phase-stats { display: flex; gap: 16px; margin-bottom: 12px; font-size: 13px; }
+  .phase-card .phase-stats .stat { font-weight: 700; }
+  .phase-card ul { list-style: none; font-size: 13px; }
+  .phase-card ul li { padding: 3px 0; padding-left: 16px; position: relative; }
+  .phase-card ul li::before { content: '\2022'; position: absolute; left: 0; font-weight: 700; }
+  .lesson-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+  .lesson-table thead th {
+    background: var(--blue); color: white; padding: 10px 10px; text-align: left;
+    font-weight: 600; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.5px; position: sticky; top: 0;
+  }
+  .lesson-table tbody td { padding: 8px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .lesson-table .phase-row td {
+    font-weight: 700; font-size: 14px; padding: 14px 10px 8px;
+    border-bottom: 2px solid #ccc; background: #f8f8f8;
+  }
+  .lesson-table tbody tr:hover:not(.phase-row) { background: #f8f9ff; }
+  .lesson-table .xp { text-align: center; font-weight: 600; }
+  .lesson-table .grade { text-align: center; }
+  .totals-bar {
+    display: flex; justify-content: space-around;
+    background: linear-gradient(135deg, var(--blue), #1a3a6e);
+    color: white; padding: 20px; border-radius: 10px;
+    margin-top: 24px; text-align: center;
+  }
+  .totals-bar .total-item .number { font-size: 32px; font-weight: 700; }
+  .totals-bar .total-item .label {
+    font-size: 12px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .filters { display: flex; gap: 8px; margin: 12px 0 16px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: white; cursor: pointer; font-size: 12px; font-weight: 600;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--blue); color: white; border-color: var(--blue);
+  }
+  .print-note {
+    text-align: center; color: #aaa; font-size: 12px;
+    margin-top: 32px; padding-bottom: 20px;
+  }
+  @media print {
+    body { background: white; }
+    .container { max-width: 100%; padding: 0; }
+    .section { box-shadow: none; break-inside: avoid; }
+    .print-note { display: none; }
+    .filters { display: none; }
+  }
+  @media (max-width: 768px) {
+    .phase-grid { grid-template-columns: 1fr; }
+    .header .meta { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Custom Reading Remediation Plan</h1>
+    <div class="subtitle">MobyMax Reading Skills &mdash; Personalized Intervention</div>
+    <div class="meta">
+      <span>Student: Ada Cone</span>
+      <span>Grade: 3</span>
+      <span>Report Date: May 4, 2026</span>
+      <span>Platform: MobyMax (Grade 3)</span>
+    </div>
+  </div>
+
+  <div class="score-cards">
+    <div class="score-card fail">
+      <div class="test-name">STAAR G3.2013</div>
+      <div class="date">Released 2013</div>
+      <div class="score low">42.5%</div>
+      <div class="breakdown"><span class="right">17 correct</span> &middot; <span class="wrong">23 incorrect</span></div>
+    </div>
+    <div class="score-card fail">
+      <div class="test-name">STAAR G3.2023</div>
+      <div class="date">Released 2023</div>
+      <div class="score low">60.0%</div>
+      <div class="breakdown"><span class="right">15 correct</span> &middot; <span class="wrong">10 incorrect</span></div>
+    </div>
+    <div class="score-card warn">
+      <div class="test-name">STAAR G3.2022</div>
+      <div class="date">Released 2022</div>
+      <div class="score mid">75.8%</div>
+      <div class="breakdown"><span class="right">25 correct</span> &middot; <span class="wrong">8 incorrect</span></div>
+    </div>
+    <div class="score-card warn">
+      <div class="test-name">STAAR G3.2021</div>
+      <div class="date">Released 2021</div>
+      <div class="score mid">79.4%</div>
+      <div class="breakdown"><span class="right">27 correct</span> &middot; <span class="wrong">7 incorrect</span></div>
+    </div>
+    <div class="score-card warn">
+      <div class="test-name">STAAR G3.2019</div>
+      <div class="date">Released 2019</div>
+      <div class="score mid">79.4%</div>
+      <div class="breakdown"><span class="right">27 correct</span> &middot; <span class="wrong">7 incorrect</span></div>
+    </div>
+    <div class="score-card warn">
+      <div class="test-name">STAAR G3.2014</div>
+      <div class="date">Released 2014</div>
+      <div class="score mid">80.0%</div>
+      <div class="breakdown"><span class="right">32 correct</span> &middot; <span class="wrong">8 incorrect</span></div>
+    </div>
+    <div class="score-card warn">
+      <div class="test-name">STAAR G3.2018</div>
+      <div class="date">Released 2018</div>
+      <div class="score mid">82.4%</div>
+      <div class="breakdown"><span class="right">28 correct</span> &middot; <span class="wrong">6 incorrect</span></div>
+    </div>
+    <div class="score-card pass">
+      <div class="test-name">STAAR G3.2017</div>
+      <div class="date">Released 2017</div>
+      <div class="score high">85.3%</div>
+      <div class="breakdown"><span class="right">29 correct</span> &middot; <span class="wrong">5 incorrect</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Skill Gap Analysis</h2>
+    <p style="font-size:14px; color:#666; margin-bottom:16px;">Ranked by frequency of errors across 8 Grade 3 STAAR reading assessments (avg score 73.1%, 74 total wrong answers). Inference and text evidence are the two largest gaps, each driven by consistent misreads of &ldquo;what can the reader conclude&rdquo; and &ldquo;which detail best supports&rdquo; question types.</p>
+    <ul class="gap-list">
+      <li class="gap-item">
+        <div class="gap-rank">1</div>
+        <div class="gap-info">
+          <div class="gap-name">Inference &amp; Drawing Conclusions</div>
+          <div class="gap-desc">Misses &ldquo;what can the reader conclude,&rdquo; &ldquo;what can the reader infer,&rdquo; and diagram-completion questions across stories, informational text, and poems. Especially common in questions about character motivation and relationships.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:100%"></div></div>
+          <div class="gap-count">16 errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">2</div>
+        <div class="gap-info">
+          <div class="gap-name">Text Evidence &amp; Supporting Details</div>
+          <div class="gap-desc">Picks the wrong sentence when asked which detail &ldquo;best explains,&rdquo; &ldquo;best supports,&rdquo; or &ldquo;best shows.&rdquo; Misses both explicit retrieval and evidence-for-a-claim questions across literary and informational passages.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:81%"></div></div>
+          <div class="gap-count">13 errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">3</div>
+        <div class="gap-info">
+          <div class="gap-name">Text Features &amp; Graphics</div>
+          <div class="gap-desc">Trouble with cause&rarr;effect diagrams, photograph captions, subheadings, and section titles. Often selects a text feature that exists but answers a different question than what is being asked.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:69%"></div></div>
+          <div class="gap-count">11 errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">4</div>
+        <div class="gap-info">
+          <div class="gap-name">Summary</div>
+          <div class="gap-desc">Picks summaries that focus on a single detail or leave out the resolution instead of accurately capturing the whole story or passage. Particularly consistent across the 2013 and 2014 tests.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:44%"></div></div>
+          <div class="gap-count">7 errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">5</div>
+        <div class="gap-info">
+          <div class="gap-name">Author&rsquo;s Purpose &amp; Craft</div>
+          <div class="gap-desc">Misses why an author includes specific imagery, an opinion, or a claim &mdash; and why a poet uses punctuation such as exclamation points. Confuses the descriptive &ldquo;what&rdquo; with the purposeful &ldquo;why.&rdquo;</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:38%"></div></div>
+          <div class="gap-count">6 errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">6</div>
+        <div class="gap-info">
+          <div class="gap-name">Vocabulary &amp; Context Clues</div>
+          <div class="gap-desc">Misses antonyms, synonyms, and dictionary-entry meaning questions. Includes one unanswered item. Generally improving &mdash; only 1&ndash;2 errors per test on most assessments, but the 2013 test reveals a more serious gap.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:38%"></div></div>
+          <div class="gap-count">6 errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">7</div>
+        <div class="gap-info">
+          <div class="gap-name">Theme, Main Idea &amp; Central Message</div>
+          <div class="gap-desc">Difficulty identifying the central idea of an informational article or the lesson/main message of a story. Picks a supporting detail instead of the overarching message.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:31%"></div></div>
+          <div class="gap-count">5 errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">8</div>
+        <div class="gap-info">
+          <div class="gap-name">Poetry Elements &amp; Craft</div>
+          <div class="gap-desc">Misses questions about stanza structure, rhyme scheme, and what specific lines contribute to meaning. Also one error on identifying narrative poetry by its story-telling quality.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:25%"></div></div>
+          <div class="gap-count">4 errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">9</div>
+        <div class="gap-info">
+          <div class="gap-name">Plot, Drama &amp; Poetry Structure</div>
+          <div class="gap-desc">Confuses story problem/resolution (why a character is upset, what leads to the solution) and the role of specific plot events in moving the story forward.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:19%"></div></div>
+          <div class="gap-count">3 errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">10</div>
+        <div class="gap-info">
+          <div class="gap-name">Cross-Text Comparison &amp; Synthesis</div>
+          <div class="gap-desc">Two errors on paired-text questions asking how two selections &ldquo;are alike&rdquo; and how they &ldquo;are different&rdquo; on the same topic.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:13%"></div></div>
+          <div class="gap-count">2 errors</div>
+        </div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-rank">11</div>
+        <div class="gap-info">
+          <div class="gap-name">Text Structure</div>
+          <div class="gap-desc">One error on how information in a recipe section differs structurally from the surrounding selection.</div>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar"><div class="gap-bar-fill" style="width:6%"></div></div>
+          <div class="gap-count">1 error</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Wrong Answers &mdash; Detailed Breakdown</h2>
+
+    <h3>STAAR G3.2013 &mdash; Released 2013 (42.5%) &mdash; <span style="color:var(--red)">lowest score</span></h3>
+    <table class="detail-table">
+      <thead><tr><th>Q#</th><th>Question</th><th>Skill Gap</th><th>Correct Answer</th></tr></thead>
+      <tbody>
+        <tr><td>Q3</td><td>Diagram: CAUSE &rarr; Joubert had worked with animals in the past. Which sentence best completes the diagram?</td><td><span class="tag tag-inference">Inference</span></td><td>Joubert knew how to make the milk Jessica needed.</td></tr>
+        <tr><td>Q4</td><td>The reader can conclude that it is unusual for &mdash;</td><td><span class="tag tag-inference">Inference</span></td><td>a hippo to live with humans</td></tr>
+        <tr><td>Q5</td><td>The photograph best supports which idea from the passage?</td><td><span class="tag tag-features">Text Features</span></td><td>Jessica&rsquo;s size makes keeping her as a pet difficult.</td></tr>
+        <tr><td>Q6</td><td>Which of these is the best summary of the passage? [Jessica the hippo]</td><td><span class="tag tag-summary">Summary</span></td><td>Tonie Joubert found a weak baby hippo near his house and decided to take care of her. With Joubert&rsquo;s help, the hippo grew big and strong. The hippo seems to like staying with Joubert, and she is treated like a member of the family.</td></tr>
+        <tr><td>Q8</td><td>Which sentence best explains why Joubert was able to provide the care Jessica needed?</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>He had nursed many orphaned animals back to health.</td></tr>
+        <tr><td>Q12</td><td>What lesson does Judy learn? [&ldquo;M.D. = A Moody Day&rdquo;]</td><td><span class="tag tag-purpose">Theme</span></td><td>It is difficult to fool your mother.</td></tr>
+        <tr><td>Q13</td><td>Which sentence best shows that Judy is upset with her brother?</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>Judy stuck out her cherry-red, no-mumps tongue at Stink.</td></tr>
+        <tr><td>Q14</td><td>Read the dictionary entry for &ldquo;straight&rdquo; &mdash; which meaning best fits the way <em>straight</em> is used in paragraph 1?</td><td><span class="tag tag-vocab">Vocabulary</span></td><td>Meaning 4: following one after another</td></tr>
+        <tr><td>Q18</td><td>William Tappenden started making potato chips at home and selling them to grocery stores because he knew that &mdash;</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>people would like to buy chips without having to go to a restaurant</td></tr>
+        <tr><td>Q21</td><td>How were potato chips first sold in some grocery stores?</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>In paper bags that were filled from a barrel</td></tr>
+        <tr><td>Q22</td><td>Which sentence from the passage best supports the idea that there have been many changes made to potato chips?</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>Bigger and better kinds of packages were designed, and different flavors of chips started appearing.</td></tr>
+        <tr><td>Q23</td><td>What can the reader conclude from the information after Step 5 of the recipe?</td><td><span class="tag tag-inference">Inference</span></td><td>The taste of the potato chips can be easily changed.</td></tr>
+        <tr><td>Q24</td><td>In paragraph 3, what does the word <em>dissatisfied</em> mean? [unanswered]</td><td><span class="tag tag-vocab">Vocabulary</span></td><td>Not satisfied</td></tr>
+        <tr><td>Q25</td><td>Which of these is the best summary of the passage? [&ldquo;The Story Behind the Crunch&rdquo;]</td><td><span class="tag tag-summary">Summary</span></td><td>Potato chips had an unusual start, but they soon became a well-known snack. They were sold at restaurants first and then at grocery stores. Today potato chips come in many flavors. They are enjoyed by people around the world.</td></tr>
+        <tr><td>Q26</td><td>According to the directions in the recipe, which step requires assistance?</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>Step 2</td></tr>
+        <tr><td>Q27</td><td>Diagram: CAUSE &rarr; A customer complains a second time. Which sentence best completes the diagram?</td><td><span class="tag tag-features">Diagram</span></td><td>Crum fries very thin potato slices until they are crisp.</td></tr>
+        <tr><td>Q28</td><td>Read line 8: &ldquo;I thought that I would die!&rdquo; The poet uses this line to show that the speaker is &mdash; [&ldquo;Saw My Teacher on a Saturday&rdquo;]</td><td><span class="tag tag-purpose">Author&rsquo;s Purpose</span></td><td>embarrassed</td></tr>
+        <tr><td>Q29</td><td>Why does the poet use the exclamation points in the first stanza?</td><td><span class="tag tag-purpose">Author&rsquo;s Purpose</span></td><td>To emphasize the speaker&rsquo;s surprise</td></tr>
+        <tr><td>Q31</td><td>Which of these lines from the poem rhyme?</td><td><span class="tag tag-poetry">Poetry</span></td><td>Lines 2 and 4</td></tr>
+        <tr><td>Q34</td><td>Which word is a synonym of <em>creating</em> in paragraph 10? [&ldquo;Kwan&rsquo;s Secret Talent&rdquo;]</td><td><span class="tag tag-vocab">Vocabulary</span></td><td>Making</td></tr>
+        <tr><td>Q35</td><td>Why is Kwan seeing Mrs. Gibbs at the grocery store important to this story?</td><td><span class="tag tag-inference">Inference</span></td><td>It leads to Kwan sharing his talent with his classmates.</td></tr>
+        <tr><td>Q38</td><td>What is the best summary of the story? [&ldquo;Kwan&rsquo;s Secret Talent&rdquo;]</td><td><span class="tag tag-summary">Summary</span></td><td>A teacher wants her student to tell the class about his special talent. The student worries about what his classmates will think. In class he realizes that they like learning about his talent.</td></tr>
+        <tr><td>Q39</td><td>Sequence diagram &mdash; which sentence best completes the diagram? [wrapping cloths]</td><td><span class="tag tag-features">Diagram / Sequence</span></td><td>Halmoni tells Kwan why wrapping cloths are special.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>STAAR G3.2023 &mdash; Released 2023 (60.0%)</h3>
+    <table class="detail-table">
+      <thead><tr><th>Q#</th><th>Question</th><th>Skill Gap</th><th>Correct Answer</th></tr></thead>
+      <tbody>
+        <tr><td>Q2</td><td>In paragraphs 26 through 28, what key idea does the reader learn about Grandpa when he hears about the new dent in the trumpet?</td><td><span class="tag tag-inference">Inference</span></td><td>Grandpa is an understanding person.</td></tr>
+        <tr><td>Q4</td><td>What can the reader infer about Kevin&rsquo;s friends from paragraphs 4 through 10?</td><td><span class="tag tag-inference">Inference</span></td><td>Kevin&rsquo;s friends do not understand why Kevin feels upset.</td></tr>
+        <tr><td>Q6</td><td>What is the most likely reason the author includes the imagery in paragraph 30: &ldquo;Every ding, dent, and scratch can tell a tale&rdquo;?</td><td><span class="tag tag-purpose">Author&rsquo;s Purpose</span></td><td>To show that Grandpa thinks playing the trumpet matters more than how it looks</td></tr>
+        <tr><td>Q9</td><td>What is Kevin&rsquo;s main problem in the story?</td><td><span class="tag tag-plot">Plot Structure</span></td><td>Kevin is afraid Grandpa will think Kevin is careless.</td></tr>
+        <tr><td>Q18</td><td>What is the meaning of the word <em>effort</em> in paragraph 3 of &ldquo;Rewards for Recycling&rdquo;?</td><td><span class="tag tag-vocab">Vocabulary</span></td><td>A serious try</td></tr>
+        <tr><td>Q19</td><td>In paragraph 2 of &ldquo;Rewards for Recycling,&rdquo; what opinion does the author use to explain why some people do not recycle?</td><td><span class="tag tag-purpose">Author&rsquo;s Purpose</span></td><td>Recycling can be confusing.</td></tr>
+        <tr><td>Q21</td><td>Which claim does the author make in the selection &ldquo;Laws for Less Trash&rdquo;?</td><td><span class="tag tag-purpose">Author&rsquo;s Purpose</span></td><td>Laws and reminders are the best way to make recycling in the city better.</td></tr>
+        <tr><td>Q22</td><td>In paragraph 4 of &ldquo;Laws for Less Trash,&rdquo; the details about reminders support the key idea that &mdash;</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>reminders can help people learn what to do with their recyclables</td></tr>
+        <tr><td>Q23</td><td>What is one way that the authors of BOTH selections support their claims?</td><td><span class="tag tag-comparison">Cross-Text</span></td><td>By showing how some places have gotten people to recycle more</td></tr>
+        <tr><td>Q24</td><td>How are the ideas about recycling in the selections DIFFERENT?</td><td><span class="tag tag-comparison">Cross-Text</span></td><td>&ldquo;Rewards for Recycling&rdquo; says that recycling should help people as well as the planet.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>STAAR G3.2022 &mdash; Released 2022 (75.8%)</h3>
+    <table class="detail-table">
+      <thead><tr><th>Q#</th><th>Question</th><th>Skill Gap</th><th>Correct Answer</th></tr></thead>
+      <tbody>
+        <tr><td>Q2</td><td>Why is the fox&rsquo;s plan important to the resolution of the story? [&ldquo;The Unwelcome Neighbor&rdquo;]</td><td><span class="tag tag-plot">Plot Structure</span></td><td>The plan causes the snake to move away from the tree.</td></tr>
+        <tr><td>Q6</td><td>What is the most likely reason the author includes this illustration in the story?</td><td><span class="tag tag-features">Text Features</span></td><td>To show an important part of the fox&rsquo;s plan</td></tr>
+        <tr><td>Q7</td><td>Which key idea do the details in paragraphs 11 and 12 support about the goals of Mission Blue?</td><td><span class="tag tag-purpose">Theme / Main Idea</span></td><td>Young people can do their part to help oceans.</td></tr>
+        <tr><td>Q9</td><td>What can the reader conclude about Mission Blue from information throughout the selection?</td><td><span class="tag tag-inference">Inference</span></td><td>Mission Blue values teaching people about oceans.</td></tr>
+        <tr><td>Q12</td><td>Based on paragraph 9, what can the reader infer about why members of Mission Blue enjoy working with scientists?</td><td><span class="tag tag-inference">Inference</span></td><td>Scientists have knowledge about which ocean plants or animals need help.</td></tr>
+        <tr><td>Q14</td><td>Based on the section &ldquo;Beyond the Ocean,&rdquo; what can the reader infer about Mission Blue members?</td><td><span class="tag tag-inference">Inference</span></td><td>They want more people to help with the team&rsquo;s goals.</td></tr>
+        <tr><td>Q15</td><td>What is the central idea of the selection?</td><td><span class="tag tag-purpose">Main Idea</span></td><td>The group Mission Blue works in different ways to care for oceans.</td></tr>
+        <tr><td>Q22</td><td>Which sentence best describes Coyote&rsquo;s relationship with Conejo by the end of the story?</td><td><span class="tag tag-inference">Inference</span></td><td>Coyote is upset with Conejo for saying something that was untrue.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>STAAR G3.2021 &mdash; Released 2021 (79.4%)</h3>
+    <table class="detail-table">
+      <thead><tr><th>Q#</th><th>Question</th><th>Skill Gap</th><th>Correct Answer</th></tr></thead>
+      <tbody>
+        <tr><td>Q2</td><td>Which text feature helps the reader locate information about why many animals leave porcupines alone?</td><td><span class="tag tag-features">Text Features</span></td><td>The subheading &ldquo;Super Quills&rdquo;</td></tr>
+        <tr><td>Q9</td><td>What is the main message of the story? [&ldquo;A Gift from Nature&rdquo;]</td><td><span class="tag tag-purpose">Theme</span></td><td>Making the right choice can be difficult.</td></tr>
+        <tr><td>Q10</td><td>Which of these events leads to Layla finding the geode?</td><td><span class="tag tag-plot">Plot Structure</span></td><td>She stops to take a photograph.</td></tr>
+        <tr><td>Q25</td><td>Which sentence best describes the stanzas of the poem? [&ldquo;Autumn Walk&rdquo;]</td><td><span class="tag tag-poetry">Poetry</span></td><td>Each stanza creates an image for the reader.</td></tr>
+        <tr><td>Q26</td><td>These lines help the reader picture the way the leaves &mdash; [lines 15&ndash;17]</td><td><span class="tag tag-inference">Inference</span></td><td>look along the street</td></tr>
+        <tr><td>Q28</td><td>Which lines of the poem best show why the speaker likes the leaves?</td><td><span class="tag tag-inference">Inference</span></td><td>Lines 26 and 27</td></tr>
+        <tr><td>Q32</td><td>How is the paper in &ldquo;Make Your Own Amate Painting&rdquo; different from the bark paper described in the rest of the selection?</td><td><span class="tag tag-features">Text Structure</span></td><td>It has been crumpled.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>STAAR G3.2019 &mdash; Released 2019 (79.4%)</h3>
+    <table class="detail-table">
+      <thead><tr><th>Q#</th><th>Question</th><th>Skill Gap</th><th>Correct Answer</th></tr></thead>
+      <tbody>
+        <tr><td>Q4</td><td>Which word is an antonym of <em>fancy</em> in paragraph 16?</td><td><span class="tag tag-vocab">Vocabulary</span></td><td>Plain</td></tr>
+        <tr><td>Q9</td><td>Why does Frank become upset about the waffle contest?</td><td><span class="tag tag-inference">Inference</span></td><td>His waffle display begins to fall apart.</td></tr>
+        <tr><td>Q13</td><td>According to the selection, how did publishers make Little Golden Books easy for shoppers to find?</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>They printed each book with the same spine.</td></tr>
+        <tr><td>Q22</td><td>What did Bessie want to do after she became a successful pilot?</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>Open her own school for pilots</td></tr>
+        <tr><td>Q28</td><td>What is the best summary of the selection? [&ldquo;Howdy, Big Tex&rdquo;]</td><td><span class="tag tag-summary">Summary</span></td><td>A giant cowboy named Big Tex stands at the front of the Texas State Fair. He smiles, waves, and greets visitors. After the first Big Tex burned in a fire, a more lifelike Big Tex was built to take his place.</td></tr>
+        <tr><td>Q31</td><td>Which text feature best helps the reader understand where to find details about the first Big Tex?</td><td><span class="tag tag-features">Text Features</span></td><td>The section title &ldquo;Big Tex in the Beginning&rdquo;</td></tr>
+        <tr><td>Q34</td><td>Diagram: CAUSE &rarr; Snell&rsquo;s workers sent emails about &ldquo;fried chicken.&rdquo; Which sentence completes the diagram?</td><td><span class="tag tag-features">Diagram</span></td><td>Snell&rsquo;s workers wanted to keep their work secret from others.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>STAAR G3.2018 &mdash; Released 2018 (82.4%)</h3>
+    <table class="detail-table">
+      <thead><tr><th>Q#</th><th>Question</th><th>Skill Gap</th><th>Correct Answer</th></tr></thead>
+      <tbody>
+        <tr><td>Q8</td><td>Which sentence from the story contains descriptions that appeal most to the reader&rsquo;s sense of touch?</td><td><span class="tag tag-purpose">Author&rsquo;s Purpose</span></td><td>&ldquo;Then he packed the sand with both hands while Max dumped on more sand and slapped it into a mound.&rdquo;</td></tr>
+        <tr><td>Q17</td><td>According to the boxed information &ldquo;Make Your Own Stargazing Flashlight,&rdquo; what should the reader do right after cutting the red plastic or cloth?</td><td><span class="tag tag-features">Text Features</span></td><td>Place it over the lighted end of the flashlight</td></tr>
+        <tr><td>Q23</td><td>How are the stanzas in the poem alike? [&ldquo;Kittens&rdquo; by Myra Cohn Livingston]</td><td><span class="tag tag-poetry">Poetry</span></td><td>They have the same number of lines.</td></tr>
+        <tr><td>Q27</td><td>The photograph next to paragraph 2 helps the reader understand &mdash; [&ldquo;The Cupcake Queen&rdquo;]</td><td><span class="tag tag-features">Text Features</span></td><td>what tools Taylor uses in the kitchen</td></tr>
+        <tr><td>Q29</td><td>The section titled &ldquo;Rising to the Challenge&rdquo; is mainly about how Taylor &mdash;</td><td><span class="tag tag-purpose">Main Idea</span></td><td>first got started with her business</td></tr>
+        <tr><td>Q31</td><td>Taylor informed people of her cupcake business mainly by &mdash;</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>handing out business cards</td></tr>
+      </tbody>
+    </table>
+
+    <h3>STAAR G3.2014 &mdash; Released 2014 (80.0%)</h3>
+    <table class="detail-table">
+      <thead><tr><th>Q#</th><th>Question</th><th>Skill Gap</th><th>Correct Answer</th></tr></thead>
+      <tbody>
+        <tr><td>Q5</td><td>In paragraph 2, <em>roamed</em> means &mdash;</td><td><span class="tag tag-vocab">Vocabulary</span></td><td>wandered</td></tr>
+        <tr><td>Q6</td><td>Millan believes it is important for dog owners to &mdash;</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>show their dogs that they are in charge</td></tr>
+        <tr><td>Q13</td><td>What is the best summary of this story? [&ldquo;Can Do, Jenny Archer&rdquo;]</td><td><span class="tag tag-summary">Summary</span></td><td>Jenny&rsquo;s class will collect cans for a contest at their school. The student who collects the most cans will win the contest. Jenny and her friend Beth are both determined to win.</td></tr>
+        <tr><td>Q19</td><td>Diagram with PlayPumps benefits &mdash; which of the following correctly completes the diagram?</td><td><span class="tag tag-features">Diagram</span></td><td>How PlayPumps Help People</td></tr>
+        <tr><td>Q20</td><td>Which sentence from the article tells something that could be a problem with PlayPumps?</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>Making sure the pumps work correctly can be expensive.</td></tr>
+        <tr><td>Q30</td><td>This poem is an example of narrative poetry mostly because it &mdash; [&ldquo;Styrofoam Wings&rdquo;]</td><td><span class="tag tag-poetry">Poetry</span></td><td>tells a story</td></tr>
+        <tr><td>Q33</td><td>After reading paragraph 6, the reader can conclude that Allan was &mdash; [&ldquo;The Dog and the Joey&rdquo;]</td><td><span class="tag tag-inference">Inference</span></td><td>entertained by the way Rex and the joey played together</td></tr>
+        <tr><td>Q38</td><td>What is the best summary of the selection? [&ldquo;Kwan&rsquo;s Secret Talent&rdquo;]</td><td><span class="tag tag-summary">Summary</span></td><td>A teacher wants her student to tell the class about his special talent. The student worries about what his classmates will think. In class he realizes that they like learning about his talent.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>STAAR G3.2017 &mdash; Released 2017 (85.3%)</h3>
+    <table class="detail-table">
+      <thead><tr><th>Q#</th><th>Question</th><th>Skill Gap</th><th>Correct Answer</th></tr></thead>
+      <tbody>
+        <tr><td>Q1</td><td>Which of Mrs. Snavin&rsquo;s actions helps the reader visualize why Jake is embarrassed?</td><td><span class="tag tag-inference">Inference</span></td><td>She said it so loud that every kid in the classroom stopped and turned to look at us, just in time to see Mrs. Snavin pat me on the top of my head like I was a nice little poodle or something.</td></tr>
+        <tr><td>Q11</td><td>Why is it surprising that Roxy was found?</td><td><span class="tag tag-inference">Inference</span></td><td>Roxy was far from home.</td></tr>
+        <tr><td>Q19</td><td>Mrs. Baird purchased an oven because the wood-burning stove she was using &mdash;</td><td><span class="tag tag-evidence">Text Evidence</span></td><td>was too small</td></tr>
+        <tr><td>Q31</td><td>Diagram: CAUSE &rarr; Horse-farm workers cared for Breeze. Which sentence best completes the diagram?</td><td><span class="tag tag-features">Diagram</span></td><td>Breeze was separated from his mother.</td></tr>
+        <tr><td>Q32</td><td>What is the best summary of the section titled &ldquo;Popular Toys&rdquo;?</td><td><span class="tag tag-summary">Summary</span></td><td>Teddy bears quickly became a popular toy, and several toy companies started making their own teddy bears. Children wanted to play and snuggle with the bears. Songs and stories were written about them. Soon they were seen on all sorts of items, including books and clothing.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>MobyMax Remediation Plan Summary</h2>
+    <p style="font-size:14px; color:#666; margin-bottom:8px;">Focused 4-part plan: 38 highest-priority MobyMax Grade 3 lessons totaling 230 XP, targeting only the gaps surfaced by Ada&rsquo;s wrong answers. Inference and text evidence come first because they are the two largest gaps; later parts address text features, summary, theme, vocabulary, and poetry/plot structure.</p>
+
+    <div class="phase-grid">
+      <div class="phase-card p1">
+        <div class="phase-title">Part 1: Inference &amp; Text Evidence</div>
+        <div class="phase-stats">
+          <span><span class="stat">9</span> lessons</span>
+          <span><span class="stat">66</span> XP</span>
+        </div>
+        <ul>
+          <li>Make inferences using key details in stories</li>
+          <li>Use details to infer answers in informational text</li>
+          <li>Ask and answer questions about key details</li>
+          <li>Understand characters&rsquo; motivations</li>
+          <li>Support conclusions with textual evidence</li>
+        </ul>
+      </div>
+      <div class="phase-card p2">
+        <div class="phase-title">Part 2: Text Features &amp; Summary</div>
+        <div class="phase-stats">
+          <span><span class="stat">10</span> lessons</span>
+          <span><span class="stat">51</span> XP</span>
+        </div>
+        <ul>
+          <li>Locate and use headings, indexes, and key words</li>
+          <li>Identify and interpret illustrations in informational text</li>
+          <li>Choose the best text feature to answer a question</li>
+          <li>Recount stories including fables and folktales</li>
+          <li>Identify main events and key details for retelling</li>
+        </ul>
+      </div>
+      <div class="phase-card p3">
+        <div class="phase-title">Part 3: Theme, Main Idea &amp; Author&rsquo;s Purpose</div>
+        <div class="phase-stats">
+          <span><span class="stat">9</span> lessons</span>
+          <span><span class="stat">52</span> XP</span>
+        </div>
+        <ul>
+          <li>Identify main ideas of paragraphs</li>
+          <li>Determine the central message with key details</li>
+          <li>Distinguish topics from themes in stories</li>
+          <li>Literal and figurative language</li>
+          <li>First-person and third-person points of view</li>
+        </ul>
+      </div>
+      <div class="phase-card p4">
+        <div class="phase-title">Part 4: Vocabulary, Plot/Poetry &amp; Cross-Text</div>
+        <div class="phase-stats">
+          <span><span class="stat">10</span> lessons</span>
+          <span><span class="stat">61</span> XP</span>
+        </div>
+        <ul>
+          <li>Context clues in literary and informational text</li>
+          <li>Word parts: prefixes</li>
+          <li>Story structure, problem and solution</li>
+          <li>Rhyme scheme and stanzas in poems</li>
+          <li>Compare and contrast main ideas across texts</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="totals-bar">
+    <div class="total-item"><div class="number">38</div><div class="label">Total Lessons</div></div>
+    <div class="total-item"><div class="number">230</div><div class="label">Total XP</div></div>
+    <div class="total-item"><div class="number">4</div><div class="label">Parts</div></div>
+    <div class="total-item"><div class="number">11</div><div class="label">Skill Areas</div></div>
+  </div>
+
+  <div class="section" style="margin-top:24px;">
+    <h2>Complete Lesson List by Part</h2>
+    <p style="font-size:14px; color:#666; margin-bottom:4px;">All 38 MobyMax Grade 3 lessons organized by part, mapped to the specific skill gap each addresses.</p>
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterPhase('all',this)">All Parts</button>
+      <button class="filter-btn" onclick="filterPhase('w1',this)">Part 1</button>
+      <button class="filter-btn" onclick="filterPhase('w2',this)">Part 2</button>
+      <button class="filter-btn" onclick="filterPhase('w3',this)">Part 3</button>
+      <button class="filter-btn" onclick="filterPhase('w4',this)">Part 4</button>
+    </div>
+    <table class="lesson-table" id="lessonTable">
+      <thead><tr>
+        <th style="width:50px">Gr</th><th>Course</th><th>Topic</th><th>Lesson</th><th style="width:50px">XP</th><th>Skill Gap</th>
+      </tr></thead>
+      <tbody id="lessonBody"></tbody>
+    </table>
+  </div>
+
+  <!-- API Sheet Export -->
+  <div class="section" style="margin-top:24px;">
+    <h2>API Sheet Export</h2>
+    <p style="font-size:14px; color:#666; margin-bottom:12px;">Tab-separated rows matching the <em>API</em> tab format. Paste into the API tab starting at cell A2.</p>
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+      <button id="apiCopyBtn" onclick="copyApiTSV()" style="background:var(--blue); color:white; border:none; padding:8px 16px; border-radius:6px; font-size:14px; cursor:pointer;">Copy to clipboard</button>
+      <span id="apiCopyMsg" style="font-size:13px; color:var(--green); font-weight:600;"></span>
+    </div>
+    <pre id="apiBlock" style="background:#1e1e2e; color:#e8e8f0; padding:16px; border-radius:8px; font-family:'SF Mono', Menlo, Consolas, monospace; font-size:12px; line-height:1.5; overflow:auto; max-height:400px; white-space:pre;"></pre>
+  </div>
+
+  <p class="print-note">Generated May 4, 2026 &middot; Custom plan based on analysis of 8 Grade 3 STAAR reading assessments (avg 73.1%)</p>
+
+</div>
+
+<script>
+const lessons = [
+  // Part 1: Inference & Text Evidence (9 lessons, 66 XP)
+  {phase:"w1",phaseName:"Part 1: Inference & Text Evidence",gr:3,course:"Literature",topic:"Making Inferences",lesson:"Refer to specific key details to make inferences about a story",xp:8,gap:"Inference & Drawing Conclusions",lid:"mobymax_reading_464_g3"},
+  {phase:"w1",gr:3,course:"Informational",topic:"Making Inferences",lesson:"Use details to infer answers to questions about informational text",xp:8,gap:"Inference & Drawing Conclusions",lid:"mobymax_informational_text_416_g3"},
+  {phase:"w1",gr:3,course:"Literature",topic:"Asking Questions",lesson:"Ask and answer questions about key details in a story",xp:9,gap:"Inference & Drawing Conclusions",lid:"mobymax_reading_457_g3"},
+  {phase:"w1",gr:3,course:"Literature",topic:"Character Analysis",lesson:"Understand characters' motivations in stories",xp:7,gap:"Inference & Drawing Conclusions",lid:"mobymax_reading_401_g3"},
+  {phase:"w1",gr:3,course:"Literature",topic:"Key Details",lesson:"Answer questions using key details in literature",xp:4,gap:"Inference & Drawing Conclusions",lid:"mobymax_reading_458_g3"},
+  {phase:"w1",gr:3,course:"Informational",topic:"Supporting Details",lesson:"Support conclusions with details from informational text",xp:8,gap:"Text Evidence & Supporting Details",lid:"mobymax_informational_text_417_g3"},
+  {phase:"w1",gr:3,course:"Informational",topic:"Text Evidence",lesson:"Use details from text to answer questions",xp:7,gap:"Text Evidence & Supporting Details",lid:"mobymax_informational_text_408_g3"},
+  {phase:"w1",gr:3,course:"Literature",topic:"Key Details",lesson:"Use key details to support answers about literature",xp:9,gap:"Text Evidence & Supporting Details",lid:"mobymax_reading_463_g3"},
+  {phase:"w1",gr:3,course:"Informational",topic:"Supporting Details",lesson:"Identify supporting details in informational text",xp:6,gap:"Text Evidence & Supporting Details",lid:"mobymax_informational_text_86_g3"},
+
+  // Part 2: Text Features & Summary (10 lessons, 51 XP)
+  {phase:"w2",phaseName:"Part 2: Text Features & Summary",gr:3,course:"Informational",topic:"Text Features",lesson:"Locate and use headings to find information",xp:4,gap:"Text Features & Graphics",lid:"mobymax_informational_text_295_g3"},
+  {phase:"w2",gr:3,course:"Informational",topic:"Illustrations",lesson:"Identify types of illustrations in informational text",xp:5,gap:"Text Features & Graphics",lid:"mobymax_informational_text_424_g3"},
+  {phase:"w2",gr:3,course:"Informational",topic:"Illustrations",lesson:"Answer questions using illustrations in informational text",xp:5,gap:"Text Features & Graphics",lid:"mobymax_informational_text_425_g3"},
+  {phase:"w2",gr:3,course:"Informational",topic:"Text Features",lesson:"Locate and use indexes in informational text",xp:5,gap:"Text Features & Graphics",lid:"mobymax_informational_text_296_g3"},
+  {phase:"w2",gr:3,course:"Informational",topic:"Text Features",lesson:"Choose the best text feature to find information",xp:4,gap:"Text Features & Graphics",lid:"mobymax_informational_text_298_g3"},
+  {phase:"w2",gr:3,course:"Informational",topic:"Text Features",lesson:"Use key words to find information in informational text",xp:4,gap:"Text Features & Graphics",lid:"mobymax_informational_text_364_g3"},
+  {phase:"w2",gr:3,course:"Literature",topic:"Retelling",lesson:"Recount stories, including fables and folktales",xp:7,gap:"Summary",lid:"mobymax_reading_320_g3"},
+  {phase:"w2",gr:3,course:"Literature",topic:"Main Events",lesson:"Identify main events in a story",xp:7,gap:"Summary",lid:"mobymax_reading_310_g3"},
+  {phase:"w2",gr:3,course:"Literature",topic:"Key Details",lesson:"Identify key details in stories",xp:5,gap:"Summary",lid:"mobymax_reading_311_g3"},
+  {phase:"w2",gr:3,course:"Informational",topic:"Retelling",lesson:"Recount and summarize informational texts",xp:5,gap:"Summary",lid:"mobymax_informational_text_118_g3"},
+
+  // Part 3: Theme, Main Idea & Author's Purpose (9 lessons, 52 XP)
+  {phase:"w3",phaseName:"Part 3: Theme, Main Idea & Author's Purpose",gr:3,course:"Informational",topic:"Main Idea",lesson:"Identify main ideas of paragraphs in informational text",xp:7,gap:"Theme, Main Idea & Central Message",lid:"mobymax_informational_text_117_g3"},
+  {phase:"w3",gr:3,course:"Informational",topic:"Main Idea",lesson:"Determine the main idea of an informational text",xp:5,gap:"Theme, Main Idea & Central Message",lid:"mobymax_informational_text_85_g3"},
+  {phase:"w3",gr:3,course:"Literature",topic:"Central Message",lesson:"Determine the central message of a story",xp:7,gap:"Theme, Main Idea & Central Message",lid:"mobymax_reading_322_g3"},
+  {phase:"w3",gr:3,course:"Literature",topic:"Central Message",lesson:"Support the central message with key details",xp:8,gap:"Theme, Main Idea & Central Message",lid:"mobymax_reading_323_g3"},
+  {phase:"w3",gr:3,course:"Literature",topic:"Theme",lesson:"Distinguish between topics and themes in stories",xp:6,gap:"Theme, Main Idea & Central Message",lid:"mobymax_reading_614_g3"},
+  {phase:"w3",gr:3,course:"Literature",topic:"Figurative Language",lesson:"Identify literal and figurative language in stories",xp:4,gap:"Author's Purpose & Craft",lid:"mobymax_reading_185_g3"},
+  {phase:"w3",gr:3,course:"Literature",topic:"Point of View",lesson:"Identify first-person and third-person points of view",xp:4,gap:"Author's Purpose & Craft",lid:"mobymax_reading_1825_g3"},
+  {phase:"w3",gr:3,course:"Literature",topic:"Point of View",lesson:"Identify the narrator or speaker in a story",xp:5,gap:"Author's Purpose & Craft",lid:"mobymax_reading_406_g3"},
+  {phase:"w3",gr:3,course:"Literature",topic:"Drama Structure",lesson:"Understand how acts and scenes build a story in drama",xp:6,gap:"Author's Purpose & Craft",lid:"mobymax_reading_487_g3"},
+
+  // Part 4: Vocabulary, Plot/Poetry & Cross-Text (10 lessons, 61 XP)
+  {phase:"w4",phaseName:"Part 4: Vocabulary, Plot/Poetry & Cross-Text",gr:3,course:"Literature",topic:"Context Clues",lesson:"Use context clues to understand word meanings in literature",xp:4,gap:"Vocabulary & Context Clues",lid:"mobymax_reading_181_g3"},
+  {phase:"w4",gr:3,course:"Informational",topic:"Context Clues",lesson:"Use context clues to understand word meanings in informational text",xp:6,gap:"Vocabulary & Context Clues",lid:"mobymax_informational_text_194_g3"},
+  {phase:"w4",gr:3,course:"Informational",topic:"Word Parts",lesson:"Use prefixes to understand word meanings",xp:4,gap:"Vocabulary & Context Clues",lid:"mobymax_informational_text_190_g3"},
+  {phase:"w4",gr:3,course:"Literature",topic:"Story Structure",lesson:"Understand the structure of stories",xp:6,gap:"Plot Structure",lid:"mobymax_reading_459_g3"},
+  {phase:"w4",gr:3,course:"Literature",topic:"Plot Structure",lesson:"Identify problem and solution in stories",xp:7,gap:"Plot Structure",lid:"mobymax_reading_321_g3"},
+  {phase:"w4",gr:3,course:"Literature",topic:"Poetry Structure",lesson:"Understand the structure of poems",xp:5,gap:"Poetry Elements & Craft",lid:"mobymax_reading_462_g3"},
+  {phase:"w4",gr:3,course:"Literature",topic:"Rhyme & Rhythm",lesson:"Identify rhyme scheme in poems",xp:5,gap:"Poetry Elements & Craft",lid:"mobymax_reading_432_g3"},
+  {phase:"w4",gr:3,course:"Literature",topic:"Poetry Structure",lesson:"Understand how stanzas build on each other in poems",xp:7,gap:"Poetry Elements & Craft",lid:"mobymax_reading_488_g3"},
+  {phase:"w4",gr:3,course:"Informational",topic:"Compare & Contrast",lesson:"Compare and contrast main ideas across informational texts",xp:9,gap:"Cross-Text Comparison & Synthesis",lid:"mobymax_informational_text_87_g3"},
+  {phase:"w4",gr:3,course:"Informational",topic:"Compare & Contrast",lesson:"Compare and contrast supporting details across informational texts",xp:8,gap:"Cross-Text Comparison & Synthesis",lid:"mobymax_informational_text_88_g3"}
+];
+
+function tagClass(gap) {
+  if (gap.includes('Vocabulary')) return 'tag-vocab';
+  if (gap.includes("Author's")) return 'tag-purpose';
+  if (gap.includes('Theme') || gap.includes('Main Idea') || gap.includes('Central')) return 'tag-purpose';
+  if (gap.includes('Inference')) return 'tag-inference';
+  if (gap.includes('Evidence') || gap.includes('Supporting')) return 'tag-evidence';
+  if (gap.includes('Text Features') || gap.includes('Graphics')) return 'tag-features';
+  if (gap.includes('Poetry Elements')) return 'tag-poetry';
+  if (gap.includes('Plot')) return 'tag-plot';
+  if (gap.includes('Summary')) return 'tag-summary';
+  if (gap.includes('Cross-Text')) return 'tag-comparison';
+  return '';
+}
+
+function renderLessons(filter) {
+  const tbody = document.getElementById('lessonBody');
+  tbody.innerHTML = '';
+  let currentPhase = '';
+  const colors = {w1:'#D6E4F0',w2:'#E2EFDA',w3:'#FFF2CC',w4:'#FCE4D6'};
+  const phaseNames = {
+    w1:'Part 1: Inference & Text Evidence — 66 XP',
+    w2:'Part 2: Text Features & Summary — 51 XP',
+    w3:"Part 3: Theme, Main Idea & Author's Purpose — 52 XP",
+    w4:'Part 4: Vocabulary, Plot/Poetry & Cross-Text — 61 XP'
+  };
+  const filtered = filter === 'all' ? lessons : lessons.filter(l => l.phase === filter);
+  filtered.forEach(l => {
+    if (l.phase !== currentPhase) {
+      currentPhase = l.phase;
+      const phaseRow = document.createElement('tr');
+      phaseRow.className = 'phase-row';
+      phaseRow.dataset.phase = l.phase;
+      phaseRow.innerHTML = `<td colspan="6" style="background:${colors[l.phase]}">${phaseNames[l.phase]}</td>`;
+      tbody.appendChild(phaseRow);
+    }
+    const tr = document.createElement('tr');
+    tr.dataset.phase = l.phase;
+    tr.innerHTML = `
+      <td class="grade">${l.gr}</td>
+      <td>${l.course}</td>
+      <td>${l.topic}</td>
+      <td>${l.lesson}</td>
+      <td class="xp">${l.xp}</td>
+      <td><span class="tag ${tagClass(l.gap)}">${l.gap}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterPhase(phase, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLessons(phase);
+}
+
+renderLessons('all');
+
+function buildApiTSV() {
+  const header = ['email','lesson_id','order','lesson name','subject','course title','course source'].join('\t');
+  const email = 'ada.cone@alpha.school';
+  const subject = 'Reading';
+  const courseTitle = 'MobyMax Reading Skills 3 HFing Course Ada Cone 05-04-2026';
+  const rows = lessons.map((l, i) => {
+    const courseSource = `MobyMax - Reading Skills ${l.course === 'Literature' ? 'Literature' : 'Informational'} ${l.gr} Hole-Filling`;
+    return [email, l.lid, i + 1, l.lesson, subject, courseTitle, courseSource].join('\t');
+  });
+  return [header, ...rows].join('\n');
+}
+
+document.getElementById('apiBlock').textContent = buildApiTSV();
+
+function copyApiTSV() {
+  const text = buildApiTSV();
+  navigator.clipboard.writeText(text).then(() => {
+    const msg = document.getElementById('apiCopyMsg');
+    msg.textContent = 'Copied!';
+    setTimeout(() => { msg.textContent = ''; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
