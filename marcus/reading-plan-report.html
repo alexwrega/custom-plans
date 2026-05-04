@@ -680,13 +680,13 @@ function filterPhase(phase, btn) {
 renderLessons('all');
 
 function buildApiTSV() {
-  const header = ['email','lesson_id','order','lesson name','subject','course title','course source'].join('\t');
+  const header = ['email','lesson_id','order','lesson_name','subject','app','course_title','grade','xp'].join('\t');
   const email = 'marcus.fuentes@alpha.school';
   const subject = 'Reading';
   const courseTitle = 'MobyMax Reading Skills 5 HFing Course Marcus Fuentes 04-29-2026';
   const rows = lessons.map((l, i) => {
     const courseSource = `MobyMax - Reading Skills ${l.course === 'Literature' ? 'Literature' : 'Informational'} ${l.gr} Hole-Filling`;
-    return [email, l.lid, i + 1, l.lesson, subject, courseTitle, courseSource].join('\t');
+    return [email, l.lid, i + 1, l.lesson, subject, 'mobymax', courseTitle, l.gr, l.xp].join('\t');
   });
   return [header, ...rows].join('\n');
 }

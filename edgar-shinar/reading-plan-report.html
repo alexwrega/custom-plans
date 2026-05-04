@@ -783,7 +783,7 @@ const lessonIds = [
 ];
 
 function buildApiTSV() {
-  const header = ['email','lesson_id','order','lesson name','subject','course title','course source'].join('\t');
+  const header = ['email','lesson_id','order','lesson_name','subject','app','course_title','grade','xp'].join('\t');
   const email = 'edgar.shinar@alpha.school';
   const subject = 'Reading';
   const studentName = 'Edgar Shinar';
@@ -792,7 +792,7 @@ function buildApiTSV() {
   const courseTitle = `MobyMax Reading Skills ${grades} HFing Course ${studentName} ${reportDate}`;
   const rows = lessons.map((l, i) => {
     const courseSource = `MobyMax - Reading Skills ${l.course === 'Literature' ? 'Literature' : 'Informational'} ${l.gr} Hole-Filling`;
-    return [email, lessonIds[i] || '', i + 1, l.lesson, subject, courseTitle, courseSource].join('\t');
+    return [email, lessonIds[i] || '', i + 1, l.lesson, subject, 'mobymax', courseTitle, l.gr, l.xp].join('\t');
   });
   return [header, ...rows].join('\n');
 }

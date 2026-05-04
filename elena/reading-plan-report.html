@@ -766,12 +766,13 @@ function filterLessons(filter, btn) {
 // Build API export
 function buildApi() {
   const email = 'elena.mentgen@alpha.school';
-  const course = 'MobyMax Reading Skills 6 HFing Course Elena Mentgen 05-04-2026';
-  const source = 'mobymax';
+  const courseTitle = 'MobyMax Reading Skills 6 HFing Course Elena Mentgen 05-04-2026';
   const subject = 'Reading';
-  return lessons.map((l, i) =>
-    [email, l.lid, i+1, l.lesson, subject, course, source].join('\t')
-  ).join('\n');
+  const header = ['email','lesson_id','order','lesson_name','subject','app','course_title','grade','xp'].join('\t');
+  const rows = lessons.map((l, i) =>
+    [email, l.lid, i+1, l.lesson, subject, 'mobymax', courseTitle, l.gr, l.xp].join('\t')
+  );
+  return [header, ...rows].join('\n');
 }
 
 function copyApi() {
