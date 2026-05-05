@@ -181,6 +181,16 @@
     .phase-grid { grid-template-columns: 1fr; }
     .header .meta { flex-wrap: wrap; }
   }
+
+  /* Mastery tracking */
+  .mastery-col { text-align: center; width: 90px; }
+  .mastery-btn { cursor: pointer; font-size: 18px; border: none; background: none; padding: 2px 6px; color: #ccc; line-height: 1; }
+  .mastery-btn.done { color: var(--green); font-weight: 700; }
+  .mastery-date { font-size: 10px; color: var(--gray); display: block; margin-top: 1px; }
+  .lesson-table tbody tr.mastered > td { background: #f0fff4 !important; }
+  .progress-wrap { background: white; border-radius: 10px; padding: 18px 32px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .progress-bar-outer { height: 14px; background: #e9ecef; border-radius: 7px; overflow: hidden; margin: 8px 0 4px; }
+  .progress-bar-inner { height: 100%; background: var(--green); border-radius: 7px; transition: width 0.4s ease; }
 </style>
 </head>
 <body>
@@ -486,7 +496,19 @@
     </table>
   </div>
 
-  <div class="section">
+  
+  <div class="progress-wrap" id="progressWrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div>
+        <strong style="font-size:15px;color:var(--blue)">Plan Progress</strong>
+        <span id="progressLabel" style="margin-left:10px;font-size:13px;color:var(--gray)">Loading&#8230;</span>
+      </div>
+      <button onclick="showImportModal()" style="padding:5px 14px;border-radius:6px;border:1px solid var(--border);background:white;cursor:pointer;font-size:12px;font-weight:600;">&#8679; Import Scores</button>
+    </div>
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBarInner" style="width:0%"></div></div>
+  </div>
+
+<div class="section">
     <h2>MobyMax Remediation Plan Summary</h2>
     <p style="font-size:14px; color:#666; margin-bottom:8px;">Focused 5-part plan: 52 highest-priority MobyMax Grade 7 lessons capped at 284 XP. Inference comes first because it underlies every other skill type; Author&rsquo;s Purpose and Summary follow since Lily&rsquo;s 2019 collapse (14 wrong) was driven heavily by those two gaps. Figurative Language and Character work close out the plan.</p>
 
@@ -582,7 +604,7 @@
     </div>
     <table class="lesson-table" id="lessonTable">
       <thead><tr>
-        <th style="width:50px">Gr</th><th>Course</th><th>Topic</th><th>Lesson</th><th style="width:50px">XP</th><th>Skill Gap</th>
+        <th style="width:50px">Gr</th><th>Course</th><th>Topic</th><th>Lesson</th><th style="width:50px">XP</th><th>Skill Gap</th><th style="width:90px">Mastered</th>
       </tr></thead>
       <tbody id="lessonBody"></tbody>
     </table>
@@ -699,11 +721,12 @@ function renderLessons(filter) {
       const phaseRow = document.createElement('tr');
       phaseRow.className = 'phase-row';
       phaseRow.dataset.phase = l.phase;
-      phaseRow.innerHTML = `<td colspan="6" style="background:${colors[l.phase]}">${phaseNames[l.phase]}</td>`;
+      phaseRow.innerHTML = `<td colspan="7" style="background:${colors[l.phase]}">${phaseNames[l.phase]}</td>`;
       tbody.appendChild(phaseRow);
     }
     const tr = document.createElement('tr');
     tr.dataset.phase = l.phase;
+    tr.dataset.lid = l.lid || '';
     tr.innerHTML = `
       <td class="grade">${l.gr}</td>
       <td>${l.course}</td>
@@ -746,6 +769,108 @@ function copyApiTSV() {
     setTimeout(() => { msg.textContent = ''; }, 2000);
   });
 }
+
+// === MASTERY TRACKING ===
+const MASTERY_KEY = 'mobymax_mastery_lily_gray';
+let masteryData = JSON.parse(localStorage.getItem(MASTERY_KEY) || '{}');
+
+// Populate l.lid for reports using separate lessonIds array
+if (typeof lessonIds !== 'undefined') {
+  lessons.forEach((l, i) => { if (!l.lid) l.lid = lessonIds[i] || null; });
+}
+
+// Patch render function to apply mastery column after each render
+const _origRenderFn = renderLessons;
+renderLessons = function(filter) {
+  _origRenderFn(filter);
+  applyMasteryColumn();
+};
+
+function applyMasteryColumn() {
+  const tbody = document.getElementById('lessonBody');
+  if (!tbody) return;
+  Array.from(tbody.rows).forEach(tr => {
+    if (tr.classList.contains('phase-row')) return;
+    const lid = tr.dataset.lid || null;
+    const ex = tr.querySelector('.mastery-col');
+    if (ex) ex.remove();
+    const m = lid && masteryData[lid] ? masteryData[lid] : null;
+    const td = document.createElement('td');
+    td.className = 'mastery-col';
+    td.innerHTML = `<button class="mastery-btn${m?' done':''}" onclick="toggleMastery('${lid}',this)">${m ? '&#10003;' : '&#9675;'}</button><span class="mastery-date">${m ? m.date : ''}</span>`;
+    tr.appendChild(td);
+    if (m) tr.classList.add('mastered');
+    else tr.classList.remove('mastered');
+  });
+  updateProgress();
+}
+
+function toggleMastery(lid, btn) {
+  if (!lid) return;
+  if (masteryData[lid]) {
+    delete masteryData[lid];
+  } else {
+    masteryData[lid] = { score: 100, date: new Date().toISOString().slice(0,10) };
+  }
+  localStorage.setItem(MASTERY_KEY, JSON.stringify(masteryData));
+  applyMasteryColumn();
+}
+
+function updateProgress() {
+  const total = lessons.length;
+  const mastered = lessons.filter(l => l.lid && masteryData[l.lid]).length;
+  const pct = total ? Math.round(mastered / total * 100) : 0;
+  const label = document.getElementById('progressLabel');
+  const bar = document.getElementById('progressBarInner');
+  if (label) label.textContent = mastered + ' of ' + total + ' lessons mastered (' + pct + '%)';
+  if (bar) bar.style.width = pct + '%';
+  const bar2 = document.getElementById('progressBarInner2');
+  if (bar2) bar2.style.width = pct + '%';
+}
+
+function showImportModal() {
+  const m = document.getElementById('importModal');
+  if (m) m.style.display = 'flex';
+}
+function closeImportModal() {
+  const m = document.getElementById('importModal');
+  if (m) m.style.display = 'none';
+}
+function processImport() {
+  const text = document.getElementById('importText').value.trim();
+  let count = 0;
+  text.split('\n').forEach(line => {
+    const parts = line.split('\t');
+    if (parts.length < 2) return;
+    const lid = parts[0].trim();
+    const score = parseFloat(parts[1]);
+    const date = parts[2] ? parts[2].trim() : new Date().toISOString().slice(0,10);
+    if (!lid || isNaN(score)) return;
+    if (score >= 80) { masteryData[lid] = { score, date }; count++; }
+    else { delete masteryData[lid]; }
+  });
+  localStorage.setItem(MASTERY_KEY, JSON.stringify(masteryData));
+  closeImportModal();
+  const activeBtn = document.querySelector('.filter-btn.active');
+  if (activeBtn) activeBtn.click();
+  else { const fn = typeof renderTable==='function'?renderTable:renderLessons; fn('all'); }
+}
+
+// Apply mastery column to already-rendered table
+applyMasteryColumn();
 </script>
+
+<div id="importModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:12px;padding:28px;max-width:520px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+    <h3 style="margin-bottom:8px;color:var(--blue)">Import Mastery Scores</h3>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:12px;">Paste tab-separated data with columns: <code>lesson_id &nbsp;&nbsp; score &nbsp;&nbsp; date</code><br>Lessons with score &ge; 80% will be marked mastered.</p>
+    <textarea id="importText" rows="8" style="width:100%;font-family:monospace;font-size:11px;border:1px solid #ddd;border-radius:6px;padding:8px;resize:vertical;" placeholder="mobymax_reading_337_g6&#9;85&#9;2026-05-01&#10;mobymax_reading_336_g6&#9;92&#9;2026-05-02"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">
+      <button onclick="closeImportModal()" style="padding:8px 16px;border-radius:6px;border:1px solid #ddd;background:white;cursor:pointer;font-size:13px;">Cancel</button>
+      <button onclick="processImport()" style="padding:8px 16px;border-radius:6px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:600;font-size:13px;">Import</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
