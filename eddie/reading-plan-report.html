@@ -353,7 +353,16 @@
         <strong style="font-size:15px;color:var(--blue)">Plan Progress</strong>
         <span id="progressLabel" style="margin-left:10px;font-size:13px;color:var(--gray)">Loading&#8230;</span>
       </div>
-      <button onclick="showImportModal()" style="padding:5px 14px;border-radius:6px;border:1px solid var(--border);background:white;cursor:pointer;font-size:12px;font-weight:600;">&#8679; Import Scores</button>
+      <div style="display:flex;gap:28px;align-items:flex-end;">
+        <div style="text-align:right;line-height:1;">
+          <div id="progressPctValue" style="font-size:34px;font-weight:800;color:var(--red);">0%</div>
+          <div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-top:4px;">Complete</div>
+        </div>
+        <div style="text-align:right;line-height:1;">
+          <div id="progressDaysValue" style="font-size:34px;font-weight:800;color:var(--blue);">0</div>
+          <div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-top:4px;">School Days</div>
+        </div>
+      </div>
     </div>
     <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBarInner" style="width:0%"></div></div>
   </div>
@@ -776,7 +785,63 @@ function copyApiTSV() {
 
 // === MASTERY TRACKING ===
 const MASTERY_KEY = 'mobymax_mastery_eddie_margainjunco';
-let masteryData = JSON.parse(localStorage.getItem(MASTERY_KEY) || '{}');
+/* === BEGIN MASTERY SNAPSHOT === */
+const MASTERY_SNAPSHOT = {
+  "matched": [
+    {
+      "date": "2026-05-04",
+      "i": 28,
+      "score": 80
+    },
+    {
+      "date": "2026-05-04",
+      "i": 29,
+      "score": 80
+    },
+    {
+      "date": "2026-05-04",
+      "i": 38,
+      "score": 83
+    },
+    {
+      "date": "2026-05-05",
+      "i": 39,
+      "score": 100
+    },
+    {
+      "date": "2026-05-05",
+      "i": 40,
+      "score": 80
+    },
+    {
+      "date": "2026-05-05",
+      "i": 41,
+      "score": 80
+    },
+    {
+      "date": "2026-05-05",
+      "i": 42,
+      "score": 100
+    },
+    {
+      "date": "2026-05-05",
+      "i": 43,
+      "score": 80
+    },
+    {
+      "date": "2026-05-07",
+      "i": 44,
+      "score": 100
+    }
+  ],
+  "school_days": 4,
+  "total": 110
+};
+const SCHOOL_DAYS_COUNT = MASTERY_SNAPSHOT.school_days || 0;
+const masteryByIndex = {};
+(MASTERY_SNAPSHOT.matched || []).forEach(m => { masteryByIndex[m.i] = m; });
+let masteryData = {};  // legacy stub — read-only mode
+/* === END MASTERY SNAPSHOT === */
 
 if (typeof lessonIds !== 'undefined') {
   lessons.forEach((l, i) => { if (!l.lid) l.lid = lessonIds[i] || null; });
@@ -791,15 +856,18 @@ renderLessons = function(filter) {
 function applyMasteryColumn() {
   const tbody = document.getElementById('lessonBody');
   if (!tbody) return;
+  let lessonIdx = -1;
   Array.from(tbody.rows).forEach(tr => {
     if (tr.classList.contains('phase-row')) return;
-    const lid = tr.dataset.lid || null;
+    lessonIdx++;
     const ex = tr.querySelector('.mastery-col');
     if (ex) ex.remove();
-    const m = lid && masteryData[lid] ? masteryData[lid] : null;
+    const m = masteryByIndex[lessonIdx];
     const td = document.createElement('td');
     td.className = 'mastery-col';
-    td.innerHTML = `<button class="mastery-btn${m?' done':''}" onclick="toggleMastery('${lid}',this)">${m ? '&#10003;' : '&#9675;'}</button><span class="mastery-date">${m ? m.date : ''}</span>`;
+    td.innerHTML = m
+      ? `<span class="mastery-btn done" title="${m.score}%">&#10003;</span><span class="mastery-date">${m.date}</span>`
+      : '<span class="mastery-btn">&#9675;</span>';
     tr.appendChild(td);
     if (m) tr.classList.add('mastered');
     else tr.classList.remove('mastered');
@@ -807,70 +875,24 @@ function applyMasteryColumn() {
   updateProgress();
 }
 
-function toggleMastery(lid, btn) {
-  if (!lid) return;
-  if (masteryData[lid]) {
-    delete masteryData[lid];
-  } else {
-    masteryData[lid] = { score: 100, date: new Date().toISOString().slice(0,10) };
-  }
-  localStorage.setItem(MASTERY_KEY, JSON.stringify(masteryData));
-  applyMasteryColumn();
-}
+function toggleMastery() { /* read-only: data comes from MASTERY_SNAPSHOT */ }
 
 function updateProgress() {
-  const total = lessons.length;
-  const mastered = lessons.filter(l => l.lid && masteryData[l.lid]).length;
-  const pct = total ? Math.round(mastered / total * 100) : 0;
+  const total = MASTERY_SNAPSHOT.total || lessons.length;
+  const masteredCount = (MASTERY_SNAPSHOT.matched || []).length;
+  const pct = total ? Math.round(masteredCount / total * 100) : 0;
   const label = document.getElementById('progressLabel');
   const bar = document.getElementById('progressBarInner');
-  if (label) label.textContent = mastered + ' of ' + total + ' lessons mastered (' + pct + '%)';
+  const pctEl = document.getElementById('progressPctValue');
+  const daysEl = document.getElementById('progressDaysValue');
+  if (label) label.textContent = masteredCount + ' of ' + total + ' lessons mastered';
   if (bar) bar.style.width = pct + '%';
-}
-
-function showImportModal() {
-  const m = document.getElementById('importModal');
-  if (m) m.style.display = 'flex';
-}
-function closeImportModal() {
-  const m = document.getElementById('importModal');
-  if (m) m.style.display = 'none';
-}
-function processImport() {
-  const text = document.getElementById('importText').value.trim();
-  let count = 0;
-  text.split('\n').forEach(line => {
-    const parts = line.split('\t');
-    if (parts.length < 2) return;
-    const lid = parts[0].trim();
-    const score = parseFloat(parts[1]);
-    const date = parts[2] ? parts[2].trim() : new Date().toISOString().slice(0,10);
-    if (!lid || isNaN(score)) return;
-    if (score >= 80) { masteryData[lid] = { score, date }; count++; }
-    else { delete masteryData[lid]; }
-  });
-  localStorage.setItem(MASTERY_KEY, JSON.stringify(masteryData));
-  closeImportModal();
-  const activeBtn = document.querySelector('.filter-btn.active');
-  if (activeBtn) activeBtn.click();
-  else renderLessons('all');
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (daysEl) daysEl.textContent = SCHOOL_DAYS_COUNT;
 }
 
 // Apply mastery column to already-rendered table
 applyMasteryColumn();
 </script>
-
-<div id="importModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
-  <div style="background:white;border-radius:12px;padding:28px;max-width:520px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
-    <h3 style="margin-bottom:8px;color:var(--blue)">Import Mastery Scores</h3>
-    <p style="font-size:13px;color:var(--gray);margin-bottom:12px;">Paste tab-separated data with columns: <code>lesson_id &nbsp;&nbsp; score &nbsp;&nbsp; date</code><br>Lessons with score &ge; 80% will be marked mastered.</p>
-    <textarea id="importText" rows="8" style="width:100%;font-family:monospace;font-size:11px;border:1px solid #ddd;border-radius:6px;padding:8px;resize:vertical;" placeholder="mobymax_reading_337_g6&#9;85&#9;2026-05-01&#10;mobymax_reading_336_g6&#9;92&#9;2026-05-02"></textarea>
-    <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">
-      <button onclick="closeImportModal()" style="padding:8px 16px;border-radius:6px;border:1px solid #ddd;background:white;cursor:pointer;font-size:13px;">Cancel</button>
-      <button onclick="processImport()" style="padding:8px 16px;border-radius:6px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:600;font-size:13px;">Import</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>

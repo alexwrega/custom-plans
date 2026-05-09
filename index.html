@@ -10,6 +10,7 @@
     --blue-light: #D6E4F0;
     --green: #548235;
     --gray: #6c757d;
+    --red: #CC0000;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -92,6 +93,9 @@
     letter-spacing: 0.5px;
   }
 
+  .plan-stats .stat-item.pct .number { color: var(--red); }
+  .plan-stats .stat-item.days .number { color: var(--blue); }
+
   .arrow {
     font-size: 24px;
     color: #ccc;
@@ -116,7 +120,7 @@
 
   <div class="plan-list">
 
-    <a class="plan-card" href="jaya/reading-plan-report.html">
+    <a class="plan-card" href="jaya/reading-plan-report.html" data-slug="jaya">
       <div class="plan-info">
         <h2>Jaya</h2>
         <div class="meta">
@@ -138,11 +142,19 @@
           <div class="number">4</div>
           <div class="label">Weeks</div>
         </div>
+        <div class="stat-item pct">
+          <div class="number" data-pct>0%</div>
+          <div class="label">Complete</div>
+        </div>
+        <div class="stat-item days">
+          <div class="number" data-days>0</div>
+          <div class="label">School Days</div>
+        </div>
       </div>
       <div class="arrow">&rsaquo;</div>
     </a>
 
-    <a class="plan-card" href="eddie/reading-plan-report.html">
+    <a class="plan-card" href="eddie/reading-plan-report.html" data-slug="eddie">
       <div class="plan-info">
         <h2>Eddie</h2>
         <div class="meta">
@@ -164,11 +176,19 @@
           <div class="number">6</div>
           <div class="label">Weeks</div>
         </div>
+        <div class="stat-item pct">
+          <div class="number" data-pct>0%</div>
+          <div class="label">Complete</div>
+        </div>
+        <div class="stat-item days">
+          <div class="number" data-days>0</div>
+          <div class="label">School Days</div>
+        </div>
       </div>
       <div class="arrow">&rsaquo;</div>
     </a>
 
-    <a class="plan-card" href="edgar-shinar/reading-plan-report.html">
+    <a class="plan-card" href="edgar-shinar/reading-plan-report.html" data-slug="edgar-shinar">
       <div class="plan-info">
         <h2>Edgar Shinar</h2>
         <div class="meta">
@@ -190,11 +210,19 @@
           <div class="number">6</div>
           <div class="label">Parts</div>
         </div>
+        <div class="stat-item pct">
+          <div class="number" data-pct>0%</div>
+          <div class="label">Complete</div>
+        </div>
+        <div class="stat-item days">
+          <div class="number" data-days>0</div>
+          <div class="label">School Days</div>
+        </div>
       </div>
       <div class="arrow">&rsaquo;</div>
     </a>
 
-    <a class="plan-card" href="keaton/reading-plan-report.html">
+    <a class="plan-card" href="keaton/reading-plan-report.html" data-slug="keaton">
       <div class="plan-info">
         <h2>Keaton Beck</h2>
         <div class="meta">
@@ -216,11 +244,19 @@
           <div class="number">4</div>
           <div class="label">Parts</div>
         </div>
+        <div class="stat-item pct">
+          <div class="number" data-pct>0%</div>
+          <div class="label">Complete</div>
+        </div>
+        <div class="stat-item days">
+          <div class="number" data-days>0</div>
+          <div class="label">School Days</div>
+        </div>
       </div>
       <div class="arrow">&rsaquo;</div>
     </a>
 
-    <a class="plan-card" href="marcus/reading-plan-report.html">
+    <a class="plan-card" href="marcus/reading-plan-report.html" data-slug="marcus">
       <div class="plan-info">
         <h2>Marcus Fuentes</h2>
         <div class="meta">
@@ -242,11 +278,19 @@
           <div class="number">4</div>
           <div class="label">Parts</div>
         </div>
+        <div class="stat-item pct">
+          <div class="number" data-pct>0%</div>
+          <div class="label">Complete</div>
+        </div>
+        <div class="stat-item days">
+          <div class="number" data-days>0</div>
+          <div class="label">School Days</div>
+        </div>
       </div>
       <div class="arrow">&rsaquo;</div>
     </a>
 
-    <a class="plan-card" href="emma/reading-plan-report.html">
+    <a class="plan-card" href="emma/reading-plan-report.html" data-slug="emma">
       <div class="plan-info">
         <h2>Emma Baklanova</h2>
         <div class="meta">
@@ -268,11 +312,19 @@
           <div class="number">5</div>
           <div class="label">Parts</div>
         </div>
+        <div class="stat-item pct">
+          <div class="number" data-pct>0%</div>
+          <div class="label">Complete</div>
+        </div>
+        <div class="stat-item days">
+          <div class="number" data-days>0</div>
+          <div class="label">School Days</div>
+        </div>
       </div>
       <div class="arrow">&rsaquo;</div>
     </a>
 
-    <a class="plan-card" href="ada/reading-plan-report.html">
+    <a class="plan-card" href="ada/reading-plan-report.html" data-slug="ada">
       <div class="plan-info">
         <h2>Ada Cone</h2>
         <div class="meta">
@@ -294,11 +346,19 @@
           <div class="number">4</div>
           <div class="label">Parts</div>
         </div>
+        <div class="stat-item pct">
+          <div class="number" data-pct>0%</div>
+          <div class="label">Complete</div>
+        </div>
+        <div class="stat-item days">
+          <div class="number" data-days>0</div>
+          <div class="label">School Days</div>
+        </div>
       </div>
       <div class="arrow">&rsaquo;</div>
     </a>
 
-    <a class="plan-card" href="jacob/reading-plan-report.html">
+    <a class="plan-card" href="jacob/reading-plan-report.html" data-slug="jacob">
       <div class="plan-info">
         <h2>Jacob Mooso</h2>
         <div class="meta">
@@ -320,11 +380,19 @@
           <div class="number">4</div>
           <div class="label">Parts</div>
         </div>
+        <div class="stat-item pct">
+          <div class="number" data-pct>0%</div>
+          <div class="label">Complete</div>
+        </div>
+        <div class="stat-item days">
+          <div class="number" data-days>0</div>
+          <div class="label">School Days</div>
+        </div>
       </div>
       <div class="arrow">&rsaquo;</div>
     </a>
 
-    <a class="plan-card" href="lily/reading-plan-report.html">
+    <a class="plan-card" href="lily/reading-plan-report.html" data-slug="lily">
       <div class="plan-info">
         <h2>Lily Gray</h2>
         <div class="meta">
@@ -346,11 +414,19 @@
           <div class="number">5</div>
           <div class="label">Parts</div>
         </div>
+        <div class="stat-item pct">
+          <div class="number" data-pct>0%</div>
+          <div class="label">Complete</div>
+        </div>
+        <div class="stat-item days">
+          <div class="number" data-days>0</div>
+          <div class="label">School Days</div>
+        </div>
       </div>
       <div class="arrow">&rsaquo;</div>
     </a>
 
-    <a class="plan-card" href="elena/reading-plan-report.html">
+    <a class="plan-card" href="elena/reading-plan-report.html" data-slug="elena">
       <div class="plan-info">
         <h2>Elena Mentgen</h2>
         <div class="meta">
@@ -372,11 +448,19 @@
           <div class="number">5</div>
           <div class="label">Parts</div>
         </div>
+        <div class="stat-item pct">
+          <div class="number" data-pct>0%</div>
+          <div class="label">Complete</div>
+        </div>
+        <div class="stat-item days">
+          <div class="number" data-days>0</div>
+          <div class="label">School Days</div>
+        </div>
       </div>
       <div class="arrow">&rsaquo;</div>
     </a>
 
-    <a class="plan-card" href="teddy/reading-plan-report.html">
+    <a class="plan-card" href="teddy/reading-plan-report.html" data-slug="teddy">
       <div class="plan-info">
         <h2>Teddy Obrecht</h2>
         <div class="meta">
@@ -398,6 +482,14 @@
           <div class="number">4</div>
           <div class="label">Parts</div>
         </div>
+        <div class="stat-item pct">
+          <div class="number" data-pct>0%</div>
+          <div class="label">Complete</div>
+        </div>
+        <div class="stat-item days">
+          <div class="number" data-days>0</div>
+          <div class="label">School Days</div>
+        </div>
       </div>
       <div class="arrow">&rsaquo;</div>
     </a>
@@ -411,5 +503,63 @@
   </div>
 
 </div>
+<script>
+/* === BEGIN INDEX PROGRESS === */
+const INDEX_PROGRESS = {
+  "ada": {
+    "days": 4,
+    "pct": 3
+  },
+  "eddie": {
+    "days": 4,
+    "pct": 8
+  },
+  "edgar-shinar": {
+    "days": 4,
+    "pct": 12
+  },
+  "elena": {
+    "days": 4,
+    "pct": 100
+  },
+  "emma": {
+    "days": 6,
+    "pct": 75
+  },
+  "jacob": {
+    "days": 4,
+    "pct": 88
+  },
+  "jaya": {
+    "days": 6,
+    "pct": 2
+  },
+  "keaton": {
+    "days": 7,
+    "pct": 72
+  },
+  "lily": {
+    "days": 4,
+    "pct": 25
+  },
+  "marcus": {
+    "days": 7,
+    "pct": 50
+  },
+  "teddy": {
+    "days": 1,
+    "pct": 7
+  }
+};
+/* === END INDEX PROGRESS === */
+document.querySelectorAll('.plan-card[data-slug]').forEach(card => {
+  const slug = card.dataset.slug;
+  const p = INDEX_PROGRESS[slug] || { pct: 0, days: 0 };
+  const pctEl = card.querySelector('[data-pct]');
+  const daysEl = card.querySelector('[data-days]');
+  if (pctEl) pctEl.textContent = p.pct + '%';
+  if (daysEl) daysEl.textContent = p.days;
+});
+</script>
 </body>
 </html>
