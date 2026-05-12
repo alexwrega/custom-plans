@@ -34,6 +34,7 @@ PLAN_DATES = {
     "lily":         "2026-05-04",
     "marcus":       "2026-04-29",
     "teddy":        "2026-05-07",
+    "vayda":        "2026-05-11",
 }
 
 NON_LESSON_PREFIXES = (

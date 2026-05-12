@@ -23,6 +23,7 @@ SELECT
     WHEN '00d46de9-f30d-4c64-a62f-631c5a787e22' THEN 'lily'
     WHEN 'a3cec910-95d2-4c59-85e3-10e58289c42a' THEN 'marcus'
     WHEN '86a50290-bd1e-417f-955c-c80f86475959' THEN 'teddy'
+    WHEN 'b3c94e03-5dbf-441d-81b9-7426ca19986c' THEN 'vayda'
   END AS slug,
   a.activity_name,
   a.calendar_date::date AS d,
@@ -43,6 +44,7 @@ WHERE
  OR (a.student_id = '00d46de9-f30d-4c64-a62f-631c5a787e22' AND a.calendar_date::date >= '2026-05-04')
  OR (a.student_id = 'a3cec910-95d2-4c59-85e3-10e58289c42a' AND a.calendar_date::date >= '2026-04-29')
  OR (a.student_id = '86a50290-bd1e-417f-955c-c80f86475959' AND a.calendar_date::date >= '2026-05-07')
+ OR (a.student_id = 'b3c94e03-5dbf-441d-81b9-7426ca19986c' AND a.calendar_date::date >= '2026-05-11')
   )
   AND (
     a.course_name ILIKE '[Mobymax] Reading G%hole-filling'
