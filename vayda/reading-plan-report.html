@@ -524,7 +524,7 @@
   <!-- API Sheet Export -->
   <div class="section" style="margin-top:24px;">
     <h2>API Sheet Export</h2>
-    <p style="font-size:14px; color:#666; margin-bottom:12px;">Tab-separated rows for the 20 MobyMax lessons only. Paste into the <em>API</em> tab starting at cell A2. Alpha Read articles are assigned separately through the Alpha Read course.</p>
+    <p style="font-size:14px; color:#666; margin-bottom:12px;">Tab-separated rows for all 35 plan items &mdash; 20 MobyMax lessons (app: <code>mobymax</code>) and 15 Alpha Read articles (app: <code>alpha_read</code>). MobyMax rows use the MobyMax lesson IDs and target the hole-filling course; Alpha Read rows use the article IDs and target <em>Alpha Read - Grade 5</em>. Paste into the <em>API</em> tab starting at cell A2.</p>
     <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
       <button id="apiCopyBtn" onclick="copyApiTSV()" style="background:var(--blue); color:white; border:none; padding:8px 16px; border-radius:6px; font-size:14px; cursor:pointer;">Copy to clipboard</button>
       <span id="apiCopyMsg" style="font-size:13px; color:var(--green); font-weight:600;"></span>
@@ -654,10 +654,12 @@ function buildApiTSV() {
   const header = ['email','lesson_id','order','lesson_name','subject','app','course_title','grade','xp'].join('\t');
   const email = 'vayda.hendle@alpha.school';
   const subject = 'Reading';
-  const courseTitle = 'MobyMax Reading Skills 5 HFing Course Vayda Hendle 05-11-2026';
-  const mobyOnly = lessons.filter(l => l.type === 'mobymax');
-  const rows = mobyOnly.map((l, i) => {
-    return [email, l.lid, i + 1, l.lesson, subject, 'mobymax', courseTitle, l.gr, l.xp].join('\t');
+  const mobyCourseTitle = 'MobyMax Reading Skills 5 HFing Course Vayda Hendle 05-11-2026';
+  const alphaCourseTitle = 'Alpha Read - Grade 5';
+  const rows = lessons.map((l, i) => {
+    const app = l.type === 'alpha_read' ? 'alpha_read' : 'mobymax';
+    const courseTitle = l.type === 'alpha_read' ? alphaCourseTitle : mobyCourseTitle;
+    return [email, l.lid, i + 1, l.lesson, subject, app, courseTitle, l.gr, l.xp].join('\t');
   });
   return [header, ...rows].join('\n');
 }
